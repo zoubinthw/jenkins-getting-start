@@ -2,12 +2,24 @@ pipeline {
     agent {
         label 'maven-jdk17'
     }
-
+    triggers {
+        githubPush() // This is for GitHub push trigger
+    }
     stages {
-        stage('打印mvn版本') {
+        stage('mvn version') {
+            container('maven') {
+                sh 'mvn -v'
+            }
+        }
+        stage('Check out') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build') {
             steps {
                 container('maven') {
-                    sh 'mvn -v'
+                    sh 'mvn clean install'
                 }
             }
         }
