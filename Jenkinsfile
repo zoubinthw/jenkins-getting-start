@@ -16,14 +16,15 @@ pipeline {
         stage('Check out') {
             steps {
                 checkout scm
+                sh '拉取代码成功'
             }
         }
-        stage('Build') {
-            steps {
-                container('maven') {
-                    sh 'mvn clean install'
-                }
-            }
-        }
+//         stage('Build') {
+//             steps {
+//                 container('maven') {
+//                     sh 'mvn clean install'
+//                 }
+//             }
+//         }
     }
 }
