@@ -7,8 +7,10 @@ pipeline {
     }
     stages {
         stage('mvn version') {
-            container('maven') {
-                sh 'mvn -v'
+            steps {
+                container('maven') {
+                    sh 'mvn -v'
+                }
             }
         }
         stage('Check out') {
