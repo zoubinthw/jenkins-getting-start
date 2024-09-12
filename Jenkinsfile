@@ -6,7 +6,7 @@ pipeline {
         githubPush() // This is for GitHub push trigger
     }
     stages {
-        stage('test') {
+        stage('clean') {
             steps {
                 container('maven') {
                     sh 'mvn -v'
