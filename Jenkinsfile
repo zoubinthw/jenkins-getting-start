@@ -6,7 +6,9 @@ pipeline {
     stages {
         stage('打印mvn版本') {
             steps {
-                sh 'mvn -v'
+                container('maven') {
+                    sh 'mvn -v'
+                }
             }
         }
     }
