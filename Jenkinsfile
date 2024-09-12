@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'mvn-agent'
+        label 'maven-jdk17'
     }
 
     stages {
