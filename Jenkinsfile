@@ -21,10 +21,6 @@ pipeline {
         }
     }
 
-    withCredentials([string(credentialsId: 'gittoken', variable: 'GIT_TOKEN')]) {
-        sh 'echo $GIT_TOKEN'
-    }
-
     environment {
         GIT_REPO = 'https://github.com/zoubinthw/jenkins-getting-start.git'  // Replace with your GitHub repo
         BRANCH = 'main'  // Branch to build
@@ -41,6 +37,7 @@ pipeline {
             steps {
                 script {
                     echo "Git token is: ${env.GIT_TOKEN}"
+                    echo "$GIT_TOKEN"
                 }
             }
         }
