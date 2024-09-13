@@ -26,7 +26,7 @@ pipeline {
         BRANCH = 'main'  // Branch to build
 //         DOCKER_REGISTRY = 'your-docker-repo'  // Replace with your Docker repository (e.g., yourusername/repository)
 //         DOCKER_CREDENTIALS_ID = 'docker-credentials'  // Jenkins ID for Docker credentials
-        GIT_CREDENTIALS_ID = 'gittoken'  // Jenkins ID for GitHub credentials
+        GIT_CREDENTIALS_ID = credentials('gittoken')  // Jenkins ID for GitHub credentials
 //         KUBERNETES_DEPLOYMENT_YAML = 'k8s/deployment.yaml'  // Path to your Kubernetes deployment YAML in your repository
 //         DOCKER_IMAGE_TAG = "your-docker-repo:${env.BUILD_NUMBER}"  // Tag for Docker image
         GIT_TOKEN = credentials('gittoken')
