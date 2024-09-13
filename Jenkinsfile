@@ -51,8 +51,7 @@ pipeline {
         stage('Test02') {
             steps {
                 script {
-                    echo "Git token is: ${env.GIT_TOKEN}"
-                    echo "Git token is: ${GIT_TOKEN}"
+                    echo "Git token is: ${env.gittoken}"
                 }
             }
         }
