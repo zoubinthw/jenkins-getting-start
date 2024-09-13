@@ -35,9 +35,15 @@ pipeline {
     stages {
         stage('Test') {
             steps {
+                withCredentials([usernamePassword(credentialsId: 'gittoken', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                    echo "Git username is: ${env.GIT_USERNAME}"
+                    echo "Git password is: ${env.GIT_PASSWORD}"
+                }
+            }
+            steps {
                 script {
                     echo "Git token is: ${env.GIT_TOKEN}"
-                    echo "$GIT_TOKEN"
+                    echo "Git token is: ${GIT_TOKEN}"
                 }
             }
         }
