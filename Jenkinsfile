@@ -33,22 +33,6 @@ pipeline {
     }
 
     stages {
-        stage('Test01') {
-            steps {
-                withCredentials([standardUsernamePasswordCredentials(credentialsId: 'gittoken', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                    echo "Git username is: ${env.GIT_USERNAME}"
-                    echo "Git password is: ${env.GIT_PASSWORD}"
-                }
-            }
-        }
-        stage('Test02') {
-            steps {
-                script {
-                    echo "Git token is: ${env.GIT_TOKEN}"
-                    echo "Git token is: ${GIT_TOKEN}"
-                }
-            }
-        }
         stage('Clone Repository') {
             steps {
                 container('maven') {
@@ -64,6 +48,23 @@ pipeline {
                 }
             }
         }
+
+        stage('Test01') {
+                    steps {
+                        withCredentials([standardUsernamePasswordCredentials(credentialsId: 'gittoken', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                            echo "Git username is: ${env.GIT_USERNAME}"
+                            echo "Git password is: ${env.GIT_PASSWORD}"
+                        }
+                    }
+                }
+                stage('Test02') {
+                    steps {
+                        script {
+                            echo "Git token is: ${env.GIT_TOKEN}"
+                            echo "Git token is: ${GIT_TOKEN}"
+                        }
+                    }
+                }
 
         stage('Build with Maven') {
             steps {
