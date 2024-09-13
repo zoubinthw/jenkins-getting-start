@@ -26,19 +26,6 @@ pipeline {
     }
 
     environment {
-            GIT_TOKEN = credentials('gittoken')
-        }
-        stages {
-            stage('Test') {
-                steps {
-                    script {
-                        echo "Git token is: ${env.GIT_TOKEN}"
-                    }
-                }
-            }
-        }
-
-    environment {
         GIT_REPO = 'https://github.com/zoubinthw/jenkins-getting-start.git'  // Replace with your GitHub repo
         BRANCH = 'main'  // Branch to build
 //         DOCKER_REGISTRY = 'your-docker-repo'  // Replace with your Docker repository (e.g., yourusername/repository)
@@ -46,9 +33,17 @@ pipeline {
         GIT_CREDENTIALS_ID = 'gittoken02'  // Jenkins ID for GitHub credentials
 //         KUBERNETES_DEPLOYMENT_YAML = 'k8s/deployment.yaml'  // Path to your Kubernetes deployment YAML in your repository
 //         DOCKER_IMAGE_TAG = "your-docker-repo:${env.BUILD_NUMBER}"  // Tag for Docker image
+        GIT_TOKEN = credentials('gittoken')
     }
 
     stages {
+        stage('Test') {
+            steps {
+                script {
+                    echo "Git token is: ${env.GIT_TOKEN}"
+                }
+            }
+        }
         stage('Clone Repository') {
             steps {
                 container('maven') {
