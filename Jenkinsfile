@@ -13,7 +13,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                container('docker') {
+                container('maven') {
                     sh 'mvn clean package'
                 }
             }
