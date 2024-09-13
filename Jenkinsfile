@@ -2,21 +2,20 @@ pipeline {
     agent {
         label 'maven-jdk17'
     }
-    triggers {
-        githubPush() // This is for GitHub push trigger
-    }
+//     triggers {
+//         githubPush() // This is for GitHub push trigger
+//     }
     stages {
-//         stage('clean') {
-//             steps {
-//                 container('maven') {
-//                     sh 'mvn -v'
-//                 }
-//             }
-//         }
-        stage('Check out') {
+        stage('Checkout') {
             steps {
-                checkout scm
-                sh 'echo 拉取代码成功'
+                git 'https://github.com/zoubinthw/jenkins-getting-start.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                container('docker') {
+                    sh 'mvn clean package'
+                }
             }
         }
     }
