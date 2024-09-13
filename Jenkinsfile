@@ -1,6 +1,24 @@
 pipeline {
     agent {
-        label 'maven-jdk17'
+        kubernetes {
+            // Define the Kubernetes pod with containers for Maven and Docker
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            spec:
+              containers:
+              - name: maven
+                image: maven:3.8.4-openjdk-11
+                command:
+                - cat
+                tty: true
+              - name: docker
+                image: docker:20.10.7
+                command:
+                - cat
+                tty: true
+            '''
+        }
     }
 
     environment {
