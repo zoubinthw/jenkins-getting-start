@@ -66,7 +66,7 @@ pipeline {
                 container('maven') {
                     // Clean and package the Maven project
                     sh 'mvn -v'
-                    sh 'echo ${PROJECT_VERSION}' // 看看参数
+                    sh 'echo $PROJECT_VERSION' // 看看参数
                 }
             }
         }
