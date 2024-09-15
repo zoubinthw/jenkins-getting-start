@@ -60,50 +60,8 @@ pipeline {
             steps {
                 container('maven') {
                     // Clean and package the Maven project
-                    sh 'mvn clean package -DskipTests'
+                    sh 'mvn -v'
                 }
             }
         }
-
-//         stage('Build Docker Image') {
-//             steps {
-//                 container('docker') {
-//                     // Build Docker image using Dockerfile in the project
-//                     sh "docker build -t ${DOCKER_IMAGE_TAG} ."
-//                 }
-//             }
-//         }
-//
-//         stage('Push Docker Image') {
-//             steps {
-//                 container('docker') {
-//                     // Login to Docker registry and push the image
-//                     withDockerRegistry([ credentialsId: "${DOCKER_CREDENTIALS_ID}", url: '' ]) {
-//                         sh "docker push ${DOCKER_IMAGE_TAG}"
-//                     }
-//                 }
-//             }
-//         }
-//
-//         stage('Deploy to Kubernetes') {
-//             steps {
-//                 container('maven') {
-//                     // Use kubectl to deploy the app in Kubernetes
-//                     sh """
-//                     kubectl apply -f ${KUBERNETES_DEPLOYMENT_YAML}
-//                     kubectl set image deployment/your-deployment-name your-container-name=${DOCKER_IMAGE_TAG}
-//                     """
-//                 }
-//             }
-//         }
-    }
-
-//     post {
-//         always {
-//             container('maven') {
-//                 // Cleanup Docker images to save space
-//                 sh 'docker system prune -af'
-//             }
-//         }
-//     }
 }
