@@ -66,9 +66,11 @@ pipeline {
 
         stage('Docker image build') {
             steps {
-                // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
-                sh 'echo "当前目录是: " `pwd`'  // /home/jenkins/agent/workspace/mvn-scm-demo
-                sh 'docker build'
+                container('maven') {
+                    // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
+                    sh 'echo "当前目录是: " `pwd`'  // /home/jenkins/agent/workspace/mvn-scm-demo
+                    sh 'docker build'
+                }
             }
         }
     }
