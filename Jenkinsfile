@@ -32,6 +32,11 @@ pipeline {
         GIT_TOKEN = credentials('gittoken')
     }
 
+    parameters {
+        string(name: 'PROJECT_VERSION', defaultValue: '1.0', description: '')
+        string(name: 'PROJECT_NAME', defaultValue: 'demo', description: '')
+    }
+
     stages {
         stage('Clone Repository') {
             steps {
@@ -61,7 +66,7 @@ pipeline {
                 container('maven') {
                     // Clean and package the Maven project
                     sh 'mvn -v'
-                    sh 'ls -a' // 看看现在的文件结构
+                    sh 'echo ${PROJECT_VERSION}' // 看看参数
                 }
             }
         }
