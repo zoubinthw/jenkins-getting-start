@@ -1,6 +1,14 @@
-FROM openjdk:23-ea-22-jdk-oracle
-LABEL maintainer=binz
+# Use the official OpenJDK 17 runtime image
+FROM openjdk:17-jdk-slim
 
-COPY target/*.jar /app.jar
+# Set the working directory inside the container
+WORKDIR /app
 
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+# Copy the JAR file from the target folder into the container
+COPY target/*.jar /app/
+
+# Expose the port your application will run on (update if necessary)
+EXPOSE 8080
+
+# Command to run the JAR file
+CMD ["java", "-jar", "/app/demo-0.0.1-SNAPSHOT.jar"]

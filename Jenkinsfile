@@ -13,10 +13,17 @@ pipeline {
                 - cat
                 tty: true
               - name: docker
-                image: docker:20.10.7
-                command:
-                - cat
-                tty: true
+                  image: docker:20.10.8
+                  command:
+                  - cat
+                  tty: true
+                  volumeMounts:
+                  - name: docker-sock
+                    mountPath: /var/run/docker.sock
+                volumes:
+                - name: docker-sock
+                  hostPath:
+                    path: /var/run/docker.sock
             '''
         }
     }
@@ -60,16 +67,17 @@ pipeline {
                     // Clean and package the Maven project
                     sh 'echo "开始build"'
                     sh 'mvn clean install -Dmaven.test.skip=true'
+                    sh 'mvn clean package'
                 }
             }
         }
 
         stage('Docker image build') {
             steps {
-                container('maven') {
+                container('docker') {
                     // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
                     sh 'echo "当前目录是: " `pwd`'  // /home/jenkins/agent/workspace/mvn-scm-demo
-                    sh 'docker build'
+                    sh 'docker build .'
                 }
             }
         }
