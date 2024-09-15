@@ -38,7 +38,7 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('拉取代码') {
             steps {
                 container('maven') {
                     // Checkout the repository from GitHub
@@ -53,20 +53,13 @@ pipeline {
                 }
             }
         }
-        stage('Test02') {
-            steps {
-                script {
-                    echo "Git token is: ${env.gittoken}"
-                }
-            }
-        }
 
-        stage('Build with Maven') {
+        stage('Maven Build') {
             steps {
                 container('maven') {
                     // Clean and package the Maven project
+                    sh 'echo "开始build"'
                     sh 'mvn -v'
-                    sh 'echo $PROJECT_VERSION' // 看看参数
                 }
             }
         }
