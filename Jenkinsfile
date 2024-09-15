@@ -60,7 +60,8 @@ pipeline {
                     // Clean and package the Maven project
                     sh 'echo "开始build"'
                     sh 'pwd'
-                    sh 'ls ./'
+                    // 看看当前目录
+                    sh 'ls -al .'
                 }
             }
         }
