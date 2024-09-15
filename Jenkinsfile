@@ -66,8 +66,8 @@ pipeline {
 
         stage('check dir') {
             steps {
-                sh 'echo "当前目录是: " pwd'
-                sh 'echo "当前目录有什么: " ls ./target'
+                sh 'echo "当前目录是: " `pwd`'
+                sh 'echo "当前目录有什么: " `ls ./target`'
             }
         }
     }
