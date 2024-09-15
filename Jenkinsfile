@@ -59,7 +59,8 @@ pipeline {
                 container('maven') {
                     // Clean and package the Maven project
                     sh 'echo "开始build"'
-                    sh 'mvn -v'
+                    sh 'pwd'
+                    sh 'ls ./'
                 }
             }
         }
