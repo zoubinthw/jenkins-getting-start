@@ -13,17 +13,17 @@ pipeline {
                 - cat
                 tty: true
               - name: docker
-                  image: docker:20.10.8
-                  command:
-                  - cat
-                  tty: true
-                  volumeMounts:
-                  - name: docker-sock
-                    mountPath: /var/run/docker.sock
-                volumes:
+                image: docker:20.10.8
+                command:
+                - cat
+                tty: true
+                volumeMounts:
                 - name: docker-sock
-                  hostPath:
-                    path: /var/run/docker.sock
+                  mountPath: /var/run/docker.sock
+              volumes:
+              - name: docker-sock
+                hostPath:
+                  path: /var/run/docker.sock
             '''
         }
     }
