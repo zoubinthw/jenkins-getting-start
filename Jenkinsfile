@@ -58,16 +58,17 @@ pipeline {
             steps {
                 container('maven') {
                     // Clean and package the Maven project
-                    sh 'echo "当前的目录是:" `pwd`'
+                    sh 'echo "开始build"'
                     sh 'mvn clean install -Dmaven.test.skip=true'
                 }
             }
         }
 
-        stage('check dir') {
+        stage('Docker image build') {
             steps {
-                sh 'echo "当前目录是: " `pwd`'
-                sh 'echo "当前目录有什么: " `ls ./target`'
+                // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
+                sh 'echo "当前目录是: " `pwd`'  // /home/jenkins/agent/workspace/mvn-scm-demo
+                sh 'docker build'
             }
         }
     }
