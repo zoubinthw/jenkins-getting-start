@@ -58,8 +58,8 @@ pipeline {
             steps {
                 container('maven') {
                     // Clean and package the Maven project
-                    sh 'echo "开始build"'
                     sh 'echo "当前的目录是:" `pwd`'
+                    sh 'mvn clean install -Dmaven.test.skip=true'
                 }
             }
         }
