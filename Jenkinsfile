@@ -59,7 +59,7 @@ pipeline {
                 container('maven') {
                     // Clean and package the Maven project
                     sh 'echo "开始build"'
-                    sh '当前的目录是: `pwd`'
+                    sh 'echo "当前的目录是:" `pwd`'
                 }
             }
         }
