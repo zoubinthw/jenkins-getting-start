@@ -61,6 +61,7 @@ pipeline {
                 container('maven') {
                     // Clean and package the Maven project
                     sh 'mvn -v'
+                    sh 'ls -a' // 看看现在的文件结构
                 }
             }
         }
