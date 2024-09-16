@@ -33,6 +33,8 @@ pipeline {
         DOCKER_IMAGE = "binzoooooo/jenkins-demo-app"  // Set your Docker image name here
         REGISTRY_CREDENTIALS = 'dockerAuthInfo'  // Jenkins credential ID for Docker registry
         GIT_CREDENTIALS_ID = credentials('gittoken')  // Jenkins ID for GitHub credentials, 这个其实拿到了
+        KUBECONFIG_CREDENTIALS = 'kubeconfig-creds'  // Jenkins credentials ID for Kubernetes config
+        KUBE_NAMESPACE = 'dev-jenkins'  // Kubernetes namespace for deployment
     }
 
     parameters {
@@ -105,6 +107,24 @@ pipeline {
 
                         # Push the 'latest' tag to Docker Hub
                         docker push ${DOCKER_IMAGE}:latest
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                withCredentials([file(credentialsId: "${KUBECONFIG_CREDENTIALS}", variable: 'KUBECONFIG')]) {
+                    script {
+                        sh '''
+                        # Set the KUBECONFIG for the kubectl command
+                        export KUBECONFIG=${KUBECONFIG}
+
+                        echo 看看环境中有没有这个变量: $KUBECONFIG
+
+                        # Apply the deployment YAML
+                        kubectl apply -f jenkins-demo-deployment.yaml --namespace=${KUBE_NAMESPACE}
                         '''
                     }
                 }

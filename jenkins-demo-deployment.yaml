@@ -1,0 +1,41 @@
+# jenkins-demo-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-demo
+  labels:
+    app: jenkins-demo
+spec:
+  replicas: 2  # Number of pods
+  selector:
+    matchLabels:
+      app: jenkins-demo
+  template:
+    metadata:
+      labels:
+        app: jenkins-demo
+    spec:
+      containers:
+        - name: jenkins-demo-container
+          image: binzoooooo/jenkins-demo-app:latest  # Replace with your Docker Hub image
+          ports:
+            - containerPort: 8080  # The port your app listens on inside the container
+          env:
+            - name: JAVA_OPTS
+              value: "-Xmx512m -Xms256m"  # Example Java options, adjust if necessary
+
+---
+# jenkins-demo-deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins-demo-service
+spec:
+  selector:
+    app: jenkins-demo
+  type: NodePort  # Exposes the service externally
+  ports:
+    - protocol: TCP
+      port: 8080       # Port that the service listens on inside the cluster
+      targetPort: 8080  # Port that the container listens to inside the pod
+      nodePort: 32007   # External port for access (range: 30000-32767)
