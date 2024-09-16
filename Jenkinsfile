@@ -144,14 +144,14 @@ pipeline {
                             sh '''
                             # Set the KUBECONFIG for the kubectl command
                             export KUBECONFIG=${KUBECONFIG}
-
+                            echo 当前目录为: pwd
                             # Apply the deployment YAML
                             # sed -e 's/place_holder_namespace/${KUBE_NAMESPACE}/g' \
                             #    -e 's/place_holder_account_id/${AWS_ACCOUNT_ID}/g' \
                             #    -e 's/place_holder_region/${AWS_REGION}/g' \
                             #    -e 's/place_holder_repository/${ECR_REPOSITORY}/g' \
                             #    jenkins-demo-deployment.yaml | kubectl apply -f -
-                            kubectl delete -f jenkins-demo-deployment.yaml
+                            kubectl apply -f jenkins-demo-deployment.yaml
                             '''
                         }
                     }
