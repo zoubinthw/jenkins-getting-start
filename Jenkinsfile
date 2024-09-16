@@ -60,84 +60,84 @@ pipeline {
     }
 
     stages {
-        stage('拉取代码') {
-            steps {
-                container('maven') {
-                    // Checkout the repository from GitHub
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: "*/${BRANCH}"]],
-                        userRemoteConfigs: [[
-                            url: "${GIT_REPO}",
-                            credentialsId: "${GIT_CREDENTIALS_ID}"
-                        ]]
-                    ])
-                }
-            }
-        }
-
-        stage('Maven Build') {
-            steps {
-                container('maven') {
-                    // Clean and package the Maven project
-                    sh 'echo "开始build"'
-                    sh 'mvn clean install -Dmaven.test.skip=true'
-                    sh 'mvn clean package'
-                }
-            }
-        }
-
-        stage('Docker image build') {
-            steps {
-                container('docker') {
-                    // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
-                    sh 'echo "当前目录是: " `pwd`'  // /home/jenkins/agent/workspace/mvn-scm-demo
-                    sh 'echo 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}'
-                    sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
-                }
-            }
-        }
-
-        stage('获取AWS ECR认证信息') {
-            steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: "${AWS_CREDENTIALS}"
-                ]]) {
-                    container('aws-cli') {
-                        script {
-                            def ecrLoginUrl = sh(script: 'aws ecr get-login-password --region ${AWS_REGION}', returnStdout: true).trim()
-                            writeFile file: 'env-vars.properties', text: "ECR_LOGIN_URL=${ecrLoginUrl}"
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('推送Docker镜像') {
-            steps {
-                container('docker') {
-                    script {
-                        // Read the properties file using shell commands
-                        def ecrLoginUrl = sh(script: 'grep "^ECR_LOGIN_URL=" env-vars.properties | cut -d "=" -f2', returnStdout: true).trim()
-                        withEnv(["ECR_LOGIN_URL=${ecrLoginUrl}"]) {
-                            sh '''
-                            docker login --username AWS -p ${ECR_LOGIN_URL}  ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-
-                            # Tag the image
-                            docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
-                            # Push the image to ECR
-                            docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
-
-                            # Tag the image as 'latest'
-                            docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
-                            docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
-                            '''
-                        }
-                    }
-                }
-            }
-        }
+//         stage('拉取代码') {
+//             steps {
+//                 container('maven') {
+//                     // Checkout the repository from GitHub
+//                     checkout([
+//                         $class: 'GitSCM',
+//                         branches: [[name: "*/${BRANCH}"]],
+//                         userRemoteConfigs: [[
+//                             url: "${GIT_REPO}",
+//                             credentialsId: "${GIT_CREDENTIALS_ID}"
+//                         ]]
+//                     ])
+//                 }
+//             }
+//         }
+//
+//         stage('Maven Build') {
+//             steps {
+//                 container('maven') {
+//                     // Clean and package the Maven project
+//                     sh 'echo "开始build"'
+//                     sh 'mvn clean install -Dmaven.test.skip=true'
+//                     sh 'mvn clean package'
+//                 }
+//             }
+//         }
+//
+//         stage('Docker image build') {
+//             steps {
+//                 container('docker') {
+//                     // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
+//                     sh 'echo "当前目录是: " `pwd`'  // /home/jenkins/agent/workspace/mvn-scm-demo
+//                     sh 'echo 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}'
+//                     sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
+//                 }
+//             }
+//         }
+//
+//         stage('获取AWS ECR认证信息') {
+//             steps {
+//                 withCredentials([[
+//                     $class: 'AmazonWebServicesCredentialsBinding',
+//                     credentialsId: "${AWS_CREDENTIALS}"
+//                 ]]) {
+//                     container('aws-cli') {
+//                         script {
+//                             def ecrLoginUrl = sh(script: 'aws ecr get-login-password --region ${AWS_REGION}', returnStdout: true).trim()
+//                             writeFile file: 'env-vars.properties', text: "ECR_LOGIN_URL=${ecrLoginUrl}"
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//
+//         stage('推送Docker镜像') {
+//             steps {
+//                 container('docker') {
+//                     script {
+//                         // Read the properties file using shell commands
+//                         def ecrLoginUrl = sh(script: 'grep "^ECR_LOGIN_URL=" env-vars.properties | cut -d "=" -f2', returnStdout: true).trim()
+//                         withEnv(["ECR_LOGIN_URL=${ecrLoginUrl}"]) {
+//                             sh '''
+//                             docker login --username AWS -p ${ECR_LOGIN_URL}  ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+//
+//                             # Tag the image
+//                             docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
+//                             # Push the image to ECR
+//                             docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
+//
+//                             # Tag the image as 'latest'
+//                             docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
+//                             docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
+//                             '''
+//                         }
+//                     }
+//                 }
+//             }
+//         }
 
         stage('部署到Kubernetes集群') {
 //             steps {
@@ -174,8 +174,9 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig-creds', variable: 'KUBECONFIG')]) {
                     sh """
-                    kubectl --kubeconfig=$KUBECONFIG apply -f jenkins-demo-deployment.yaml
+                    # kubectl --kubeconfig=$KUBECONFIG apply -f jenkins-demo-deployment.yaml
                     # kubectl --kubeconfig=$KUBECONFIG rollout status deployment/my-java-app --namespace=dev
+                    kubectl version
                     """
                 }
             }
