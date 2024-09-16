@@ -138,22 +138,31 @@ pipeline {
 
         stage('部署到Kubernetes集群') {
             steps {
-                withCredentials([file(credentialsId: "${KUBECONFIG_CREDENTIALS}", variable: 'KUBECONFIG')]) {
-                    container('kubectl') {
-                        script {
-                            sh '''
-                            # Set the KUBECONFIG for the kubectl command
-                            export KUBECONFIG=${KUBECONFIG}
-                            echo 当前目录为: pwd
-                            # Apply the deployment YAML
-                            # sed -e 's/place_holder_namespace/${KUBE_NAMESPACE}/g' \
-                            #    -e 's/place_holder_account_id/${AWS_ACCOUNT_ID}/g' \
-                            #    -e 's/place_holder_region/${AWS_REGION}/g' \
-                            #    -e 's/place_holder_repository/${ECR_REPOSITORY}/g' \
-                            #    jenkins-demo-deployment.yaml | kubectl apply -f -
-                            kubectl apply -f jenkins-demo-deployment.yaml
-                            '''
-                        }
+//                 withCredentials([file(credentialsId: "${KUBECONFIG_CREDENTIALS}", variable: 'KUBECONFIG')]) {
+//                     container('kubectl') {
+//                         script {
+//                             sh '''
+//                             # Set the KUBECONFIG for the kubectl command
+//                             export KUBECONFIG=${KUBECONFIG}
+//                             echo 当前目录为: pwd
+//                             # Apply the deployment YAML
+//                             # sed -e 's/place_holder_namespace/${KUBE_NAMESPACE}/g' \
+//                             #    -e 's/place_holder_account_id/${AWS_ACCOUNT_ID}/g' \
+//                             #    -e 's/place_holder_region/${AWS_REGION}/g' \
+//                             #    -e 's/place_holder_repository/${ECR_REPOSITORY}/g' \
+//                             #    jenkins-demo-deployment.yaml | kubectl apply -f -
+//                             kubectl apply -f jenkins-demo-deployment.yaml
+//                             '''
+//                         }
+//                     }
+//                 }
+                container('kubectl') {
+                    script {
+                        sh """
+                        # Apply the Kubernetes deployment using kubectl
+                        echo 当前的目录是: pwd
+                        kubectl apply -f jenkins-demo-deployment.yaml
+                        """
                     }
                 }
             }
