@@ -183,7 +183,8 @@ pipeline {
                             -e 's/place_holder_region/${AWS_REGION}/g' \
                             -e 's/place_holder_repository/${ECR_REPOSITORY}/g' \
                             -e 's/place_holder_build_no/${BUILD_NUMBER}/g' \
-                            jenkins-demo-deployment.yaml | kubectl apply -f -
+                            jenkins-demo-deployment.yaml
+                        kubectl apply -f jenkins-demo-deployment.yaml
                         kubectl --kubeconfig=$KUBECONFIG rollout status deployment/jenkins-demo --namespace=dev
                         """
                     }
