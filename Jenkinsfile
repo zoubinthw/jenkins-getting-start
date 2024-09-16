@@ -26,10 +26,10 @@ pipeline {
               - name: kubectl
                 image: bitnami/kubectl:latest
                 command:
-                - sleep
-                args:
-                - 99d
+                - cat
                 tty: true
+                securityContext:
+                  runAsUser: 1000
               - name: aws-cli
                 image: amazon/aws-cli
                 command:
