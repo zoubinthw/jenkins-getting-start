@@ -178,7 +178,7 @@ pipeline {
                     container('kubectl') {
                         sh """
                         echo 当前部署namespace: ${KUBE_NAMESPACE}, 版本为: ${BUILD_NUMBER}
-                        sed -e 's/place_holder_namespace/${KUBE_NAMESPACE}/g' \
+                        sed -i -e 's/place_holder_namespace/${KUBE_NAMESPACE}/g' \
                             -e 's/place_holder_account_id/${AWS_ACCOUNT_ID}/g' \
                             -e 's/place_holder_region/${AWS_REGION}/g' \
                             -e 's/place_holder_repository/${ECR_REPOSITORY}/g' \
