@@ -105,19 +105,21 @@ pipeline {
 // //                         docker.image("${DOCKER_IMAGE}:latest").push()
 //                     }
 //                 }
-                   node {
-                      // cleanup current user docker credentials
-                      sh 'rm -f ~/.dockercfg ~/.docker/config.json || true'
+                   script {
+                       node {
+                            // cleanup current user docker credentials
+                            sh 'rm -f ~/.dockercfg ~/.docker/config.json || true'
 
-                      // configure registry
-                      docker.withRegistry("https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com", "ecr:${AWS_REGION}:${AWS_CREDENTIALS}") {
+                            // configure registry
+                            docker.withRegistry("https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com", "ecr:${AWS_REGION}:${AWS_CREDENTIALS}") {
 
-                        // build image
-                        def customImage = docker.build("${DOCKER_IMAGE}:${BUILD_NUMBER}")
+                              // build image
+                              def customImage = docker.build("${DOCKER_IMAGE}:${BUILD_NUMBER}")
 
-                        // push image
-                        customImage.push()
-                      }
+                              // push image
+                              customImage.push()
+                            }
+                       }
                    }
             }
         }
