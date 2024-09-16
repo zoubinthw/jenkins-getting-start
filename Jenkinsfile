@@ -90,31 +90,49 @@ pipeline {
             }
         }
 
-        //  这里使用aws来保存镜像
-        stage('Push image to AWS ECR') {
+        stage('Authenticate with AWS ECR') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-                                  credentialsId: "${AWS_CREDENTIALS}"
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: "${AWS_CREDENTIALS}"
                 ]]) {
                     container('docker') {
                         script {
-                            // Use the ECR plugin to authenticate and push the image
                             sh '''
-                            # Tag the image
-                            docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
-
-                            # Push the image to ECR
-                            docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
-
-                            # Tag the image as 'latest'
-                            docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
-                            docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
+                            # Get ECR login command and authenticate Docker with AWS
+                            $(aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com)
                             '''
                         }
                     }
                 }
             }
         }
+
+        //  这里使用aws来保存镜像
+//         stage('Push image to AWS ECR') {
+//             steps {
+//                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+//                                   credentialsId: "${AWS_CREDENTIALS}"
+//                 ]]) {
+//                     container('docker') {
+//                         script {
+//                             // Use the ECR plugin to authenticate and push the image
+//                             sh '''
+//                             # Tag the image
+//                             docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
+//
+//                             # Push the image to ECR
+//                             docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
+//
+//                             # Tag the image as 'latest'
+//                             docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
+//                             docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
+//                             '''
+//                         }
+//                     }
+//                 }
+//             }
+//         }
 
 //         stage('Push Docker Image to AWS ECR') {
 //             steps {
