@@ -75,7 +75,7 @@ pipeline {
                 container('docker') {
                     // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
                     sh 'echo "当前目录是: " `pwd`'  // /home/jenkins/agent/workspace/mvn-scm-demo
-                    sh '镜像名称为: echo ${DOCKER_IMAGE}:${BUILD_NUMBER}'
+                    sh 'echo 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}'
                     sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
                 }
             }
