@@ -111,14 +111,13 @@ pipeline {
             }
         }
 
-        stage('Docker 镜像提交Dev分支') {
+        stage('Docker镜像') {
             steps {
                 container('docker') {
                     script {
                         // Read the properties file using shell commands
                         def ecrLoginUrl = sh(script: 'grep "^ECR_LOGIN_URL=" env-vars.properties | cut -d "=" -f2', returnStdout: true).trim()
                         withEnv(["ECR_LOGIN_URL=${ecrLoginUrl}"]) {
-                            sh 'echo "ECR Login URL: ${ECR_LOGIN_URL}"'
                             sh '''
                             docker login --username AWS -p ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
