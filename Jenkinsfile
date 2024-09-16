@@ -156,17 +156,26 @@ pipeline {
 //                         }
 //                     }
 //                 }
-                container('kubectl') {
-                    script {
-                        sh """
-                        # Apply the Kubernetes deployment using kubectl
-                        echo 当前的目录是: pwd
-                        ls -al
-                        kubectl version
-                        # kubectl apply -f jenkins-demo-deployment.yaml
-                        """
-                    }
-                }
+//                 container('kubectl') {
+//                     script {
+//                         sh """
+//                         # Apply the Kubernetes deployment using kubectl
+//                         echo 当前的目录是: pwd
+//                         ls -al
+//                         kubectl version
+//                         # kubectl apply -f jenkins-demo-deployment.yaml
+//                         """
+//                     }
+//                 }
+                   script {
+                       withCredentials([file(credentialsId: "${KUBECONFIG_CREDENTIALS}", variable: 'KUBECONFIG')]) {
+                           sh """
+                           echo 当前的目录是: pwd
+                           ls -al
+                           kubectl version
+                           """
+                       }
+                   }
             }
         }
     }
