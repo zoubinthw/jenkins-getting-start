@@ -31,9 +31,8 @@ pipeline {
     environment {
         GIT_REPO = 'https://github.com/zoubinthw/jenkins-getting-start.git'  // Replace with your GitHub repo
         DOCKER_IMAGE = "binzoooooo/jenkins-demo-app"  // Set your Docker image name here
-        REGISTRY_CREDENTIALS = 'dockerhub-creds'  // Jenkins credential ID for Docker registry
+        REGISTRY_CREDENTIALS = 'dockerAuthInfo'  // Jenkins credential ID for Docker registry
         GIT_CREDENTIALS_ID = credentials('gittoken')  // Jenkins ID for GitHub credentials, 这个其实拿到了
-        REGISTRY_CREDENTIALS = 'dockerAuthInfo'
     }
 
     parameters {
