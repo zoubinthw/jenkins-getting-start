@@ -98,9 +98,11 @@ pipeline {
         //  这里使用aws来保存镜像
         stage('Authenticate with AWS ECR') {
             steps {
-                docker.withRegistry("https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com", "ecr:${AWS_REGION}:${AWS_CREDENTIALS}") {
-                  docker.image("${DOCKER_IMAGE}:${BUILD_NUMBER}").push()
-                  docker.image("${DOCKER_IMAGE}:latest").push()
+                script {
+                    docker.withRegistry("https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com", "ecr:${AWS_REGION}:${AWS_CREDENTIALS}") {
+                        docker.image("${DOCKER_IMAGE}:${BUILD_NUMBER}").push()
+                        docker.image("${DOCKER_IMAGE}:latest").push()
+                    }
                 }
             }
         }
