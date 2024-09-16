@@ -86,8 +86,8 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: "${REGISTRY_CREDENTIALS}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
                         script {
                             sh '''
-                            echo docker 用户名称为: "$DOCKER_USERNAME"
                             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                            docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
                             '''
                         }
                     }
