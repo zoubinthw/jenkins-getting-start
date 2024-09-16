@@ -9,8 +9,6 @@
 
 .idea
 
-./target
-./target/classes/*
-./target/*.*
+target/
 
 .mvn
