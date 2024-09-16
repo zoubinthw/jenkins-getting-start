@@ -57,21 +57,21 @@ pipeline {
     }
 
     stages {
-//         stage('拉取代码') {
-//             steps {
-//                 container('maven') {
-//                     // Checkout the repository from GitHub
-//                     checkout([
-//                         $class: 'GitSCM',
-//                         branches: [[name: "*/${BRANCH}"]],
-//                         userRemoteConfigs: [[
-//                             url: "${GIT_REPO}",
-//                             credentialsId: "${GIT_CREDENTIALS_ID}"
-//                         ]]
-//                     ])
-//                 }
-//             }
-//         }
+        stage('拉取代码') {
+            steps {
+                container('maven') {
+                    // Checkout the repository from GitHub
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${BRANCH}"]],
+                        userRemoteConfigs: [[
+                            url: "${GIT_REPO}",
+                            credentialsId: "${GIT_CREDENTIALS_ID}"
+                        ]]
+                    ])
+                }
+            }
+        }
 //
 //         stage('Maven Build') {
 //             steps {
@@ -106,10 +106,22 @@ pipeline {
                             sh '''
                             # Get ECR login command and authenticate Docker with AWS
                             # $(aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com)
-                            export PSS = $(aws ecr get-login-password --region ${AWS_REGION})
-                            echo $PSS
+                            export PSS=$(aws ecr get-login-password --region ${AWS_REGION})
                             '''
                         }
+                    }
+                }
+            }
+        }
+
+        stage('docker镜像提交') {
+            steps {
+                container('docker') {
+                    script {
+                        sh '''
+                        echo 看看密码
+                        echo $PSS
+                        '''
                     }
                 }
             }
