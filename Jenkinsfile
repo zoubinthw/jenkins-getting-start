@@ -26,7 +26,9 @@ pipeline {
               - name: kubectl
                 image: bitnami/kubectl:latest
                 command:
-                - cat
+                - sleep
+                args:
+                - 99d
                 tty: true
               - name: aws-cli
                 image: amazon/aws-cli
