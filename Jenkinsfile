@@ -169,11 +169,12 @@ pipeline {
 //                 }
 //             }
             steps {
-                kubernetesDeploy(
-                    kubeconfigId: 'kubeconfig-creds',  // Use the Jenkins credential ID for kubeconfig
-                    configs: 'jenkins-demo-deployment.yaml',           // Path to your Kubernetes manifest file
-                    enableConfigSubstitution: true            // Enable environment variable substitution in manifest
-                )
+                withCredentials([file(credentialsId: 'kubeconfig-creds', variable: 'KUBECONFIG')]) {
+                    sh """
+                    kubectl --kubeconfig=$KUBECONFIG apply -f jenkins-demo-deployment.yaml
+                    # kubectl --kubeconfig=$KUBECONFIG rollout status deployment/my-java-app --namespace=dev
+                    """
+                }
             }
         }
     }
