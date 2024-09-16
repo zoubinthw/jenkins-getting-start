@@ -20,6 +20,16 @@ pipeline {
                 volumeMounts:
                 - name: docker-sock
                   mountPath: /var/run/docker.sock
+              - name: aws-cli
+                image: amazon/aws-cli
+                command:
+                - cat
+                tty: true
+              - name: kubectl
+                image: bitnami/kubectl
+                command:
+                - cat
+                tty: true
               volumes:
               - name: docker-sock
                 hostPath:
@@ -30,11 +40,14 @@ pipeline {
 
     environment {
         GIT_REPO = 'https://github.com/zoubinthw/jenkins-getting-start.git'  // Replace with your GitHub repo
-        DOCKER_IMAGE = "binzoooooo/jenkins-demo-app"  // Set your Docker image name here
-        REGISTRY_CREDENTIALS = 'dockerAuthInfo'  // Jenkins credential ID for Docker registry
+        DOCKER_IMAGE = "jenkins-demo-app"  // Set your Docker image name here
         GIT_CREDENTIALS_ID = credentials('gittoken')  // Jenkins ID for GitHub credentials, 这个其实拿到了
         KUBECONFIG_CREDENTIALS = 'kubeconfig-creds'  // Jenkins credentials ID for Kubernetes config
         KUBE_NAMESPACE = 'dev-jenkins'  // Kubernetes namespace for deployment
+        AWS_CREDENTIALS = 'aws-ecr-creds'  // docker镜像的获取和存储放到自己的aws ecr仓库中
+        AWS_REGION = 'ap-east-1'  // e.g., 'us-west-1'
+        ECR_REPOSITORY = 'binzou/jenkins-demo'  // Your ECR repository name
+        AWS_ACCOUNT_ID = '471112990918'  // AWS Account ID
     }
 
     parameters {
@@ -82,14 +95,18 @@ pipeline {
             }
         }
 
-        stage('Docker Image Push ') {
+        //  这里使用aws来保存镜像
+        stage('Authenticate with AWS ECR') {
             steps {
-                container('docker') {
-                    withCredentials([usernamePassword(credentialsId: "${REGISTRY_CREDENTIALS}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: "${AWS_CREDENTIALS}"
+                ]]) {
+                    container('aws-cli') {
                         script {
                             sh '''
-                            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-                            docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                            # Get ECR login command and authenticate Docker with AWS
+                            $(aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com)
                             '''
                         }
                     }
@@ -97,38 +114,53 @@ pipeline {
             }
         }
 
-        stage('Push Latest App Image') {
-            steps {
-                container('docker') {
-                    script {
-                        sh '''
-                        # Tag the previously pushed image as 'latest'
-                        docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest
+//         stage('Docker Image Push ') {
+//             steps {
+//                 container('docker') {
+//                     withCredentials([usernamePassword(credentialsId: "${REGISTRY_CREDENTIALS}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+//                         script {
+//                             sh '''
+//                             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+//                             docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+//                             '''
+//                         }
+//                     }
+//                 }
+//             }
+//         }
 
-                        # Push the 'latest' tag to Docker Hub
-                        docker push ${DOCKER_IMAGE}:latest
-                        '''
-                    }
-                }
-            }
-        }
+//         stage('Push Latest App Image') {
+//             steps {
+//                 container('docker') {
+//                     script {
+//                         sh '''
+//                         # Tag the previously pushed image as 'latest'
+//                         docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest
+//
+//                         # Push the 'latest' tag to Docker Hub
+//                         docker push ${DOCKER_IMAGE}:latest
+//                         '''
+//                     }
+//                 }
+//             }
+//         }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                withCredentials([file(credentialsId: "${KUBECONFIG_CREDENTIALS}", variable: 'KUBECONFIG')]) {
-                    script {
-                        sh '''
-                        # Set the KUBECONFIG for the kubectl command
-                        export KUBECONFIG=${KUBECONFIG}
-
-                        echo 看看环境中有没有这个变量: $KUBECONFIG
-
-                        # Apply the deployment YAML
-                        kubectl apply -f jenkins-demo-deployment.yaml --namespace=${KUBE_NAMESPACE}
-                        '''
-                    }
-                }
-            }
-        }
+//         stage('Deploy to Kubernetes') {
+//             steps {
+//                 withCredentials([file(credentialsId: "${KUBECONFIG_CREDENTIALS}", variable: 'KUBECONFIG')]) {
+//                     script {
+//                         sh '''
+//                         # Set the KUBECONFIG for the kubectl command
+//                         export KUBECONFIG=${KUBECONFIG}
+//
+//                         echo 看看环境中有没有这个变量: $KUBECONFIG
+//
+//                         # Apply the deployment YAML
+//                         kubectl apply -f jenkins-demo-deployment.yaml --namespace=${KUBE_NAMESPACE}
+//                         '''
+//                     }
+//                 }
+//             }
+//         }
     }
 }
