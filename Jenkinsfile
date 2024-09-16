@@ -25,6 +25,11 @@ pipeline {
                 command:
                 - cat
                 tty: true
+              - name: aws-cli
+                image: amazon/aws-cli
+                command:
+                - cat
+                tty: true
               volumes:
               - name: docker-sock
                 hostPath:
@@ -96,11 +101,13 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: "${AWS_CREDENTIALS}"
                 ]]) {
-                    container('docker') {
+                    container('aws-cli') {
                         script {
                             sh '''
                             # Get ECR login command and authenticate Docker with AWS
-                            $(aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com)
+                            # $(aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com)
+                            export PSS = $(aws ecr get-login-password --region ${AWS_REGION})
+                            echo $PSS
                             '''
                         }
                     }
