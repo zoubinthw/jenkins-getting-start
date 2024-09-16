@@ -83,7 +83,7 @@ pipeline {
         stage('Docker Image Push ') {
             steps {
                 container('docker') {
-                    withCredentials([usernamePassword(credentialsId: '${REGISTRY_CREDENTIALS}', passwordVariable: '${DOCKER_PASSWORD}', usernameVariable: '${DOCKER_USERNAME}')]) {
+                    withCredentials([usernamePassword(credentialsId: "${REGISTRY_CREDENTIALS}", passwordVariable: '${DOCKER_PASSWORD}', usernameVariable: '${DOCKER_USERNAME}')]) {
                         script {
                             sh '''
                             echo docker 用户名称为: $DOCKER_USERNAME
