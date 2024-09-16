@@ -137,7 +137,7 @@ pipeline {
         }
 
         stage('部署到Kubernetes集群') {
-            steps {
+//             steps {
 //                 withCredentials([file(credentialsId: "${KUBECONFIG_CREDENTIALS}", variable: 'KUBECONFIG')]) {
 //                     container('kubectl') {
 //                         script {
@@ -167,17 +167,13 @@ pipeline {
 //                         """
 //                     }
 //                 }
-                   script {
-                       withCredentials([file(credentialsId: "${KUBECONFIG_CREDENTIALS}", variable: 'KUBECONFIG')]) {
-                           container('kubectl') {
-                                sh """
-                                echo 当前的目录是: pwd
-                                ls -al
-                                kubectl version
-                                """
-                           }
-                       }
-                   }
+//             }
+            steps {
+                kubernetesDeploy(
+                    kubeconfigId: 'kubeconfig-creds',  // Use the Jenkins credential ID for kubeconfig
+                    configs: 'jenkins-demo-deployment.yaml',           // Path to your Kubernetes manifest file
+                    enableConfigSubstitution: true            // Enable environment variable substitution in manifest
+                )
             }
         }
     }
