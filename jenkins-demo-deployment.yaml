@@ -26,6 +26,11 @@ spec:
               value: "-Xmx512m -Xms256m"  # Example Java options, adjust if necessary
       imagePullSecrets:
         - name: ecr-secret  # Reference the secret you created
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
 
 ---
 # jenkins-demo-deployment.yaml
