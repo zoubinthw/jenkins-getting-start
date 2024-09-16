@@ -7,6 +7,9 @@ pipeline {
             kind: Pod
             spec:
               containers:
+              - name: jnlp
+                image: jenkins/inbound-agent:latest
+                args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
               - name: maven
                 image: maven:3.8.5-openjdk-17
                 command:
