@@ -121,22 +121,17 @@ pipeline {
                 container('docker') {
                     script {
                         // Read the properties file using shell commands
-                        def ecrLoginUrl = sh(script: 'grep "^ECR_LOGIN_URL=" env-vars.properties | cut -d "=" -f2', returnStdout: true).trim()
-                        withEnv(["ECR_LOGIN_URL=${ecrLoginUrl}"]) {
-                            sh '''
-                            echo 登录并推送镜像到ECR [${BUILD_NUMBER} , latest]
-                            grep "^ECR_LOGIN_URL=" env-vars.properties | cut -d "=" -f2 | docker login --username AWS --password-stdin  ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                        echo 登录并推送镜像到ECR [${BUILD_NUMBER} , latest]
+                        grep "^ECR_LOGIN_URL=" env-vars.properties | cut -d "=" -f2 | docker login --username AWS --password-stdin  ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
-                            # Tag the image
-                            docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
-                            # Push the image to ECR
-                            docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
+                        // Tag the image
+                        docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
+                        // Push the image to ECR
+                        docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
 
-                            # Tag the image as 'latest'
-                            docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
-                            docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
-                            '''
-                        }
+                        // Tag the image as 'latest'
+                        docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
+                        docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
                     }
                 }
             }
