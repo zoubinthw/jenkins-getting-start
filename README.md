@@ -1,3 +1,7 @@
+<h1 style="color: red">睡觉前和用完后, 一定要关掉ec2!!!!! 2次了， 每次200多块无了</h1>
+<h1 style="color: red">睡觉前和用完后, 一定要关掉ec2!!!!! 2次了， 每次200多块无了</h1>
+<h1 style="color: red">睡觉前和用完后, 一定要关掉ec2!!!!! 2次了， 每次200多块无了</h1>
+
 1.创建k8s集群 <br>
 2.在集群中部署jenkins<br>
 3.配置jenkins使用k8s集群作为job代理<br>
