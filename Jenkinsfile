@@ -82,7 +82,7 @@ pipeline {
             steps {
                 container('maven') {
                     // Clean and package the Maven project
-                    sh 'echo "开始build"'
+                    sh 'echo 开始maven build'
                     sh 'mvn clean install -Dmaven.test.skip=true'
                     sh 'mvn clean package'
                 }
@@ -93,7 +93,7 @@ pipeline {
             steps {
                 container('docker') {
                     // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
-                    sh 'echo "当前目录是: " `pwd`'  // /home/jenkins/agent/workspace/mvn-scm-demo
+                    sh 'echo 开始制作镜像'
                     sh 'echo 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}'
                     sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
                 }
@@ -124,6 +124,7 @@ pipeline {
                         def ecrLoginUrl = sh(script: 'grep "^ECR_LOGIN_URL=" env-vars.properties | cut -d "=" -f2', returnStdout: true).trim()
                         withEnv(["ECR_LOGIN_URL=${ecrLoginUrl}"]) {
                             sh '''
+                            echo 登录并推送镜像到ECR [${BUILD_NUMBER} , latest]
                             docker login --username AWS -p ${ECR_LOGIN_URL}  ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
                             # Tag the image
@@ -142,48 +143,11 @@ pipeline {
         }
 
         stage('部署到Kubernetes集群') {
-//             steps {
-//                 withCredentials([file(credentialsId: "${KUBECONFIG_CREDENTIALS}", variable: 'KUBECONFIG')]) {
-//                     container('kubectl') {
-//                         script {
-//                             sh '''
-//                             # Set the KUBECONFIG for the kubectl command
-//                             export KUBECONFIG=${KUBECONFIG}
-//                             echo 当前目录为: pwd
-//                             # Apply the deployment YAML
-//                             # sed -e 's/place_holder_namespace/${KUBE_NAMESPACE}/g' \
-//                             #    -e 's/place_holder_account_id/${AWS_ACCOUNT_ID}/g' \
-//                             #    -e 's/place_holder_region/${AWS_REGION}/g' \
-//                             #    -e 's/place_holder_repository/${ECR_REPOSITORY}/g' \
-//                             #    jenkins-demo-deployment.yaml | kubectl apply -f -
-//                             kubectl apply -f jenkins-demo-deployment.yaml
-//                             '''
-//                         }
-//                     }
-//                 }
-//                 container('kubectl') {
-//                     script {
-//                         sh """
-//                         # Apply the Kubernetes deployment using kubectl
-//                         echo 当前的目录是: pwd
-//                         ls -al
-//                         kubectl version
-//                         # kubectl apply -f jenkins-demo-deployment.yaml
-//                         """
-//                     }
-//                 }
-//             }
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig-creds', variable: 'KUBECONFIG')]) {
                     container('kubectl') {
                         sh """
-                        echo 当前部署namespace: ${KUBE_NAMESPACE}, 版本为: ${BUILD_NUMBER}
-                        # sed -i -e 's/place_holder_namespace/${KUBE_NAMESPACE}/g' \
-                        #    -e 's/place_holder_account_id/${AWS_ACCOUNT_ID}/g' \
-                        #    -e 's/place_holder_region/${AWS_REGION}/g' \
-                        #    -e 's/place_holder_repository/${ECR_REPOSITORY}/g' \
-                        #    -e 's/place_holder_build_no/${BUILD_NUMBER}/g' \
-                        #    jenkins-demo-deployment.yaml
+                        echo 当前部署版本为: ${BUILD_NUMBER}
                         sed -i -e 's/place_holder_namespace/${KUBE_NAMESPACE}/g' \
                                -e 's/place_holder_account_id/${AWS_ACCOUNT_ID}/g' \
                                -e 's/place_holder_region/${AWS_REGION}/g' \
