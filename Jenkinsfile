@@ -20,6 +20,8 @@ pipeline {
                 command:
                 - cat
                 tty: true
+                securityContext:
+                  runAsUser: 1000
                 volumeMounts:
                 - name: docker-sock
                   mountPath: /var/run/docker.sock
