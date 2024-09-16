@@ -125,7 +125,7 @@ pipeline {
                         withEnv(["ECR_LOGIN_URL=${ecrLoginUrl}"]) {
                             sh '''
                             echo 登录并推送镜像到ECR [${BUILD_NUMBER} , latest]
-                            echo ${ECR_LOGIN_URL} | docker login --username AWS --password-stdin  ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                            echo "$ECR_LOGIN_URL" | docker login --username AWS --password-stdin  ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
                             # Tag the image
                             docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
