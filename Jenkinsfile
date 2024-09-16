@@ -173,11 +173,13 @@ pipeline {
 //             }
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig-creds', variable: 'KUBECONFIG')]) {
-                    sh """
-                    # kubectl --kubeconfig=$KUBECONFIG apply -f jenkins-demo-deployment.yaml
-                    # kubectl --kubeconfig=$KUBECONFIG rollout status deployment/my-java-app --namespace=dev
-                    kubectl version
-                    """
+                    container('kubectl') {
+                        sh """
+                        # kubectl --kubeconfig=$KUBECONFIG apply -f jenkins-demo-deployment.yaml
+                        # kubectl --kubeconfig=$KUBECONFIG rollout status deployment/my-java-app --namespace=dev
+                        kubectl version
+                        """
+                    }
                 }
             }
         }
