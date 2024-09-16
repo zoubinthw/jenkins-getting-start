@@ -43,7 +43,7 @@ pipeline {
         DOCKER_IMAGE = "jenkins-demo-app"  // Set your Docker image name here
         GIT_CREDENTIALS_ID = 'gittoken'  // Jenkins ID for GitHub credentials, 这个其实拿到了
         KUBECONFIG_CREDENTIALS = 'kubeconfig-creds'  // Jenkins credentials ID for Kubernetes config
-        KUBE_NAMESPACE = 'dev-jenkins'  // Kubernetes namespace for deployment
+        KUBE_NAMESPACE = 'dev'  // Kubernetes namespace for deployment
         AWS_CREDENTIALS = 'aws-ecr-creds'  // docker镜像的获取和存储放到自己的aws ecr仓库中
         AWS_REGION = 'ap-east-1'  // e.g., 'us-west-1'
         ECR_REPOSITORY = 'binzou/jenkins-demo'  // Your ECR repository name
@@ -146,11 +146,12 @@ pipeline {
                             export KUBECONFIG=${KUBECONFIG}
 
                             # Apply the deployment YAML
-                            sed -e 's/place_holder_namespace/${KUBE_NAMESPACE}/g' \
-                                -e 's/place_holder_account_id/${AWS_ACCOUNT_ID}/g' \
-                                -e 's/place_holder_region/${AWS_REGION}/g' \
-                                -e 's/place_holder_repository/${ECR_REPOSITORY}/g' \
-                                jenkins-demo-deployment.yaml | kubectl apply -f -
+                            # sed -e 's/place_holder_namespace/${KUBE_NAMESPACE}/g' \
+                            #    -e 's/place_holder_account_id/${AWS_ACCOUNT_ID}/g' \
+                            #    -e 's/place_holder_region/${AWS_REGION}/g' \
+                            #    -e 's/place_holder_repository/${ECR_REPOSITORY}/g' \
+                            #    jenkins-demo-deployment.yaml | kubectl apply -f -
+                            kubectl delete -f jenkins-demo-deployment.yaml
                             '''
                         }
                     }
