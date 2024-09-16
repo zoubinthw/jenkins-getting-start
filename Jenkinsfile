@@ -120,7 +120,7 @@ pipeline {
                     script {
                         sh '''
                         echo 看看密码
-                        echo $PSS
+                        echo ${PSS}
                         '''
                     }
                 }
