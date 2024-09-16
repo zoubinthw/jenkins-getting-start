@@ -52,43 +52,43 @@ pipeline {
     }
 
     stages {
-        stage('拉取代码') {
-            steps {
-                container('maven') {
-                    // Checkout the repository from GitHub
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: "*/${BRANCH}"]],
-                        userRemoteConfigs: [[
-                            url: "${GIT_REPO}",
-                            credentialsId: "${GIT_CREDENTIALS_ID}"
-                        ]]
-                    ])
-                }
-            }
-        }
-
-        stage('Maven Build') {
-            steps {
-                container('maven') {
-                    // Clean and package the Maven project
-                    sh 'echo "开始build"'
-                    sh 'mvn clean install -Dmaven.test.skip=true'
-                    sh 'mvn clean package'
-                }
-            }
-        }
-
-        stage('Docker image build') {
-            steps {
-                container('docker') {
-                    // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
-                    sh 'echo "当前目录是: " `pwd`'  // /home/jenkins/agent/workspace/mvn-scm-demo
-                    sh 'echo 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}'
-                    sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
-                }
-            }
-        }
+//         stage('拉取代码') {
+//             steps {
+//                 container('maven') {
+//                     // Checkout the repository from GitHub
+//                     checkout([
+//                         $class: 'GitSCM',
+//                         branches: [[name: "*/${BRANCH}"]],
+//                         userRemoteConfigs: [[
+//                             url: "${GIT_REPO}",
+//                             credentialsId: "${GIT_CREDENTIALS_ID}"
+//                         ]]
+//                     ])
+//                 }
+//             }
+//         }
+//
+//         stage('Maven Build') {
+//             steps {
+//                 container('maven') {
+//                     // Clean and package the Maven project
+//                     sh 'echo "开始build"'
+//                     sh 'mvn clean install -Dmaven.test.skip=true'
+//                     sh 'mvn clean package'
+//                 }
+//             }
+//         }
+//
+//         stage('Docker image build') {
+//             steps {
+//                 container('docker') {
+//                     // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
+//                     sh 'echo "当前目录是: " `pwd`'  // /home/jenkins/agent/workspace/mvn-scm-demo
+//                     sh 'echo 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}'
+//                     sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
+//                 }
+//             }
+//         }
 
         stage('Authenticate with AWS ECR') {
             steps {
