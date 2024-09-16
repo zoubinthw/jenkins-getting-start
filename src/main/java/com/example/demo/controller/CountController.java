@@ -17,6 +17,6 @@ public class CountController {
 
     @GetMapping("/world")
     public String world() {
-        return "成功部署啦....";
+        return "滚动更新";
     }
 }
