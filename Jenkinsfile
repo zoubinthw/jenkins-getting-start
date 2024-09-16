@@ -94,5 +94,21 @@ pipeline {
                 }
             }
         }
+
+        stage('Push Latest App Image') {
+            steps {
+                container('docker') {
+                    script {
+                        sh '''
+                        # Tag the previously pushed image as 'latest'
+                        docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest
+
+                        # Push the 'latest' tag to Docker Hub
+                        docker push ${DOCKER_IMAGE}:latest
+                        '''
+                    }
+                }
+            }
+        }
     }
 }
