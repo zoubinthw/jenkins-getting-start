@@ -21,7 +21,7 @@ pipeline {
                 - name: docker-sock
                   mountPath: /var/run/docker.sock
               - name: kubectl
-                image: bitnami/kubectl
+                image: bitnami/kubectl:latest
                 command:
                 - cat
                 tty: true
@@ -169,11 +169,13 @@ pipeline {
 //                 }
                    script {
                        withCredentials([file(credentialsId: "${KUBECONFIG_CREDENTIALS}", variable: 'KUBECONFIG')]) {
-                           sh """
-                           echo 当前的目录是: pwd
-                           ls -al
-                           kubectl version
-                           """
+                           container('kubectl') {
+                                sh """
+                                echo 当前的目录是: pwd
+                                ls -al
+                                kubectl version
+                                """
+                           }
                        }
                    }
             }
