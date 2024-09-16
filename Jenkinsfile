@@ -30,7 +30,7 @@ pipeline {
 
     environment {
         GIT_REPO = 'https://github.com/zoubinthw/jenkins-getting-start.git'  // Replace with your GitHub repo
-        DOCKER_IMAGE = "your-docker-repo/your-image-name"  // Set your Docker image name here
+        DOCKER_IMAGE = "binzoooooo/jenkins-demo-app"  // Set your Docker image name here
         REGISTRY_CREDENTIALS = 'dockerhub-creds'  // Jenkins credential ID for Docker registry
         GIT_CREDENTIALS_ID = credentials('gittoken')  // Jenkins ID for GitHub credentials, 这个其实拿到了
         GIT_TOKEN = credentials('gittoken')
@@ -46,7 +46,6 @@ pipeline {
         stage('拉取代码') {
             steps {
                 container('maven') {
-                    sh 'echo ${BRANCH}'
                     // Checkout the repository from GitHub
                     checkout([
                         $class: 'GitSCM',
@@ -76,7 +75,8 @@ pipeline {
                 container('docker') {
                     // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
                     sh 'echo "当前目录是: " `pwd`'  // /home/jenkins/agent/workspace/mvn-scm-demo
-                    sh 'docker build .'
+                    sh '镜像名称为: echo ${DOCKER_IMAGE}:${BUILD_NUMBER}'
+                    sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
                 }
             }
         }
