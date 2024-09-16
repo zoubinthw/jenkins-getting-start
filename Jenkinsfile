@@ -100,6 +100,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry("https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com", "ecr:${AWS_REGION}:${AWS_CREDENTIALS}") {
+                        sh 'echo debug一下: ${DOCKER_IMAGE}:${BUILD_NUMBER}'
                         docker.image("${DOCKER_IMAGE}:${BUILD_NUMBER}").push()
                         docker.image("${DOCKER_IMAGE}:latest").push()
                     }
