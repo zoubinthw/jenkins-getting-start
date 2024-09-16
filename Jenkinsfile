@@ -126,15 +126,18 @@ pipeline {
             steps {
                 container('docker') {
                     script {
-                        // Read the environment variables file
-                        def envVars = readProperties file: '/tmp/env-vars/env-vars.properties'
+                        // Read the properties file
+                        def props = new Properties()
+                        def propsFile = new File('env-vars.properties')
+                        if (propsFile.exists()) {
+                            props.load(new FileInputStream(propsFile))
+                        }
 
-                        // Export the environment variables
-                        withEnv(["ECR_LOGIN_URL=${envVars.ECR_LOGIN_URL}"]) {
-                            // Example usage of the environment variable
-                            sh '''
-                            echo "ECR Login URL: ${ECR_LOGIN_URL}"
-                            '''
+                        // Export the variable and use it
+                        def ecrLoginUrl = props.getProperty('ECR_LOGIN_URL')
+                        withEnv(["ECR_LOGIN_URL=${ecrLoginUrl}"]) {
+                            sh 'echo "ECR Login URL: ${ECR_LOGIN_URL}"'
+                            // Use ${ECR_LOGIN_URL} in your Docker commands or other scripts
                         }
                     }
                 }
