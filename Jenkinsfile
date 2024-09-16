@@ -103,17 +103,19 @@ pipeline {
                 ]]) {
                     container('aws-cli') {
                         script {
-                            sh '''
-                            # Get ECR login command and authenticate Docker with AWS
-                            # $(aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com)
-                            # Example: Fetch an ECR login URL
-                            # def ecrLoginUrl = sh(script: 'aws ecr get-login-password --region ${AWS_REGION}', returnStdout: true).trim()
-                            export PSS=$(aws ecr get-login-password --region ${AWS_REGION})
-                            # Write environment variables to a file
-                            writeFile file: '/tmp/env-vars/env-vars.properties', text: """
-                            ECR_LOGIN_URL=${PSS}
-                            """
-                            '''
+//                             sh '''
+//                             # Get ECR login command and authenticate Docker with AWS
+//                             # $(aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com)
+//                             # Example: Fetch an ECR login URL
+//                             # def ecrLoginUrl = sh(script: 'aws ecr get-login-password --region ${AWS_REGION}', returnStdout: true).trim()
+//                             export PSS=$(aws ecr get-login-password --region ${AWS_REGION})
+//                             # Write environment variables to a file
+//                             writeFile file: '/tmp/env-vars/env-vars.properties', text: """
+//                             ECR_LOGIN_URL=${PSS}
+//                             """
+//                             '''
+                            def ecrLoginUrl = sh(script: 'aws ecr get-login-password --region ${AWS_REGION}', returnStdout: true).trim()
+                            writeFile file: 'env-vars.properties', text: "ECR_LOGIN_URL=${ecrLoginUrl}"
                         }
                     }
                 }
