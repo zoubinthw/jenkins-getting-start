@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: jenkins-demo-container
-          image: place_holder_account_id.dkr.ecr.place_holder_region.amazonaws.com/place_holder_repository:latest  # Replace with your Docker Hub image
+          image: place_holder_account_id.dkr.ecr.place_holder_region.amazonaws.com/place_holder_repository:place_holder_build_no  # Replace with your Docker Hub image
           ports:
             - containerPort: 8080  # The port your app listens on inside the container
           env:
