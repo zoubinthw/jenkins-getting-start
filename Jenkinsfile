@@ -161,7 +161,9 @@ pipeline {
                         sh """
                         # Apply the Kubernetes deployment using kubectl
                         echo 当前的目录是: pwd
-                        kubectl apply -f jenkins-demo-deployment.yaml
+                        ls -al
+                        kubectl version
+                        # kubectl apply -f jenkins-demo-deployment.yaml
                         """
                     }
                 }
