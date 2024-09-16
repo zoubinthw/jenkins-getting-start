@@ -178,14 +178,16 @@ pipeline {
                     container('kubectl') {
                         sh """
                         echo 当前部署namespace: ${KUBE_NAMESPACE}, 版本为: ${BUILD_NUMBER}
+                        # sed -i -e 's/place_holder_namespace/${KUBE_NAMESPACE}/g' \
+                        #    -e 's/place_holder_account_id/${AWS_ACCOUNT_ID}/g' \
+                        #    -e 's/place_holder_region/${AWS_REGION}/g' \
+                        #    -e 's/place_holder_repository/${ECR_REPOSITORY}/g' \
+                        #    -e 's/place_holder_build_no/${BUILD_NUMBER}/g' \
+                        #    jenkins-demo-deployment.yaml
                         sed -i -e 's/place_holder_namespace/${KUBE_NAMESPACE}/g' \
-                            -e 's/place_holder_account_id/${AWS_ACCOUNT_ID}/g' \
-                            -e 's/place_holder_region/${AWS_REGION}/g' \
-                            -e 's/place_holder_repository/${ECR_REPOSITORY}/g' \
-                            -e 's/place_holder_build_no/${BUILD_NUMBER}/g' \
                             jenkins-demo-deployment.yaml
-                        kubectl apply -f jenkins-demo-deployment.yaml
-                        kubectl --kubeconfig=$KUBECONFIG rollout status deployment/jenkins-demo --namespace=dev
+                        # kubectl apply -f jenkins-demo-deployment.yaml
+                        # kubectl --kubeconfig=$KUBECONFIG rollout status deployment/jenkins-demo --namespace=dev
                         """
                     }
                 }
