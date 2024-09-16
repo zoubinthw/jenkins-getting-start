@@ -106,7 +106,12 @@ pipeline {
                             sh '''
                             # Get ECR login command and authenticate Docker with AWS
                             # $(aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com)
-                            export PSS=$(aws ecr get-login-password --region ${AWS_REGION})
+                            // Example: Fetch an ECR login URL
+                            def ecrLoginUrl = sh(script: 'aws ecr get-login-password --region ${AWS_REGION}', returnStdout: true).trim()
+                            // Write environment variables to a file
+                            writeFile file: '/tmp/env-vars/env-vars.properties', text: """
+                            ECR_LOGIN_URL=${ecrLoginUrl}
+                            """
                             '''
                         }
                     }
@@ -118,10 +123,16 @@ pipeline {
             steps {
                 container('docker') {
                     script {
-                        sh '''
-                        echo 看看密码
-                        echo ${PSS}
-                        '''
+                        // Read the environment variables file
+                        def envVars = readProperties file: '/tmp/env-vars/env-vars.properties'
+
+                        // Export the environment variables
+                        withEnv(["ECR_LOGIN_URL=${envVars.ECR_LOGIN_URL}"]) {
+                            // Example usage of the environment variable
+                            sh '''
+                            echo "ECR Login URL: ${ECR_LOGIN_URL}"
+                            '''
+                        }
                     }
                 }
             }
