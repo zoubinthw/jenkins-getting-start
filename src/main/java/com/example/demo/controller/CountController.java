@@ -17,6 +17,6 @@ public class CountController {
 
     @GetMapping("/world")
     public String world() {
-        return "有 1000 人访问了这个页面";
+        return "成功部署啦....";
     }
 }
