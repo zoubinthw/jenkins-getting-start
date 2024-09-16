@@ -30,7 +30,6 @@ pipeline {
 
     environment {
         GIT_REPO = 'https://github.com/zoubinthw/jenkins-getting-start.git'  // Replace with your GitHub repo
-        BRANCH = 'main'  // Branch to build
         DOCKER_IMAGE = "your-docker-repo/your-image-name"  // Set your Docker image name here
         REGISTRY_CREDENTIALS = 'dockerhub-creds'  // Jenkins credential ID for Docker registry
         GIT_CREDENTIALS_ID = credentials('gittoken')  // Jenkins ID for GitHub credentials, 这个其实拿到了
@@ -40,6 +39,7 @@ pipeline {
     parameters {
         string(name: 'PROJECT_VERSION', defaultValue: '1.0', description: '')
         string(name: 'PROJECT_NAME', defaultValue: 'demo', description: '')
+        string(name: 'BRANCH', defaultValue: 'main', description: '')
     }
 
     stages {
