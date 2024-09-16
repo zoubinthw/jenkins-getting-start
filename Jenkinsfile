@@ -126,15 +126,8 @@ pipeline {
             steps {
                 container('docker') {
                     script {
-                        // Read the properties file
-                        def props = new Properties()
-                        def propsFile = new File('env-vars.properties')
-                        if (propsFile.exists()) {
-                            props.load(new FileInputStream(propsFile))
-                        }
-
-                        // Export the variable and use it
-                        def ecrLoginUrl = props.getProperty('ECR_LOGIN_URL')
+                        // Read the properties file using shell commands
+                        def ecrLoginUrl = sh(script: 'grep "^ECR_LOGIN_URL=" env-vars.properties | cut -d "=" -f2', returnStdout: true).trim()
                         withEnv(["ECR_LOGIN_URL=${ecrLoginUrl}"]) {
                             sh 'echo "ECR Login URL: ${ECR_LOGIN_URL}"'
                             // Use ${ECR_LOGIN_URL} in your Docker commands or other scripts
