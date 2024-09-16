@@ -111,7 +111,7 @@ pipeline {
             }
         }
 
-        stage('Docker镜像') {
+        stage('推送Docker镜像') {
             steps {
                 container('docker') {
                     script {
@@ -136,22 +136,26 @@ pipeline {
             }
         }
 
-//         stage('Deploy to Kubernetes') {
-//             steps {
-//                 withCredentials([file(credentialsId: "${KUBECONFIG_CREDENTIALS}", variable: 'KUBECONFIG')]) {
-//                     script {
-//                         sh '''
-//                         # Set the KUBECONFIG for the kubectl command
-//                         export KUBECONFIG=${KUBECONFIG}
-//
-//                         echo 看看环境中有没有这个变量: $KUBECONFIG
-//
-//                         # Apply the deployment YAML
-//                         kubectl apply -f jenkins-demo-deployment.yaml --namespace=${KUBE_NAMESPACE}
-//                         '''
-//                     }
-//                 }
-//             }
-//         }
+        stage('部署到Kubernetes集群') {
+            steps {
+                withCredentials([file(credentialsId: "${KUBECONFIG_CREDENTIALS}", variable: 'KUBECONFIG')]) {
+                    container('kubectl') {
+                        script {
+                            sh '''
+                            # Set the KUBECONFIG for the kubectl command
+                            export KUBECONFIG=${KUBECONFIG}
+
+                            # Apply the deployment YAML
+                            sed -e 's/place_holder_namespace/${KUBE_NAMESPACE}/g' \
+                                -e 's/place_holder_account_id/${AWS_ACCOUNT_ID}/g' \
+                                -e 's/place_holder_region/${AWS_REGION}/g' \
+                                -e 's/place_holder_repository/${ECR_REPOSITORY}/g' \
+                                jenkins-demo-deployment.yaml | kubectl apply -f -
+                            '''
+                        }
+                    }
+                }
+            }
+        }
     }
 }
