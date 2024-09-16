@@ -41,7 +41,7 @@ pipeline {
     environment {
         GIT_REPO = 'https://github.com/zoubinthw/jenkins-getting-start.git'  // Replace with your GitHub repo
         DOCKER_IMAGE = "jenkins-demo-app"  // Set your Docker image name here
-        GIT_CREDENTIALS_ID = credentials('gittoken')  // Jenkins ID for GitHub credentials, 这个其实拿到了
+        GIT_CREDENTIALS_ID = 'gittoken'  // Jenkins ID for GitHub credentials, 这个其实拿到了
         KUBECONFIG_CREDENTIALS = 'kubeconfig-creds'  // Jenkins credentials ID for Kubernetes config
         KUBE_NAMESPACE = 'dev-jenkins'  // Kubernetes namespace for deployment
         AWS_CREDENTIALS = 'aws-ecr-creds'  // docker镜像的获取和存储放到自己的aws ecr仓库中
