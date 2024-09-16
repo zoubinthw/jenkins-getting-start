@@ -17,6 +17,6 @@ public class CountController {
 
     @GetMapping("/world")
     public String world() {
-        return "refactor code并且记录了一些随笔";
+        return "今天先写到这吧";
     }
 }
