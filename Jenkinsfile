@@ -111,7 +111,7 @@ pipeline {
             }
         }
 
-        stage('Docker 镜像提交') {
+        stage('Docker 镜像提交Dev分支') {
             steps {
                 container('docker') {
                     script {
@@ -120,10 +120,10 @@ pipeline {
                         withEnv(["ECR_LOGIN_URL=${ecrLoginUrl}"]) {
                             sh 'echo "ECR Login URL: ${ECR_LOGIN_URL}"'
                             sh '''
-                            echo ${ECR_LOGIN_URL} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                            docker login --username AWS -p ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
                             # Tag the image
                             docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
-
                             # Push the image to ECR
                             docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
 
@@ -136,68 +136,6 @@ pipeline {
                 }
             }
         }
-
-        //  这里使用aws来保存镜像
-//         stage('Push image to AWS ECR') {
-//             steps {
-//                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-//                                   credentialsId: "${AWS_CREDENTIALS}"
-//                 ]]) {
-//                     container('docker') {
-//                         script {
-//                             // Use the ECR plugin to authenticate and push the image
-//                             sh '''
-//                             # Tag the image
-//                             docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
-//
-//                             # Push the image to ECR
-//                             docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
-//
-//                             # Tag the image as 'latest'
-//                             docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
-//                             docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
-//                             '''
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-
-//         stage('Push Docker Image to AWS ECR') {
-//             steps {
-//                 container('docker') {
-//                     script {
-//                         sh '''
-//                         # Tag the image
-//                         docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
-//
-//                         # Push the image to ECR
-//                         docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
-//
-//                         # Tag the image as 'latest'
-//                         docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
-//                         docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
-//                         '''
-//                     }
-//                 }
-//             }
-//         }
-
-//         stage('Push Latest App Image') {
-//             steps {
-//                 container('docker') {
-//                     script {
-//                         sh '''
-//                         # Tag the previously pushed image as 'latest'
-//                         docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest
-//
-//                         # Push the 'latest' tag to Docker Hub
-//                         docker push ${DOCKER_IMAGE}:latest
-//                         '''
-//                     }
-//                 }
-//             }
-//         }
 
 //         stage('Deploy to Kubernetes') {
 //             steps {
