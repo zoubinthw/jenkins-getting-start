@@ -33,7 +33,7 @@ pipeline {
         DOCKER_IMAGE = "binzoooooo/jenkins-demo-app"  // Set your Docker image name here
         REGISTRY_CREDENTIALS = 'dockerhub-creds'  // Jenkins credential ID for Docker registry
         GIT_CREDENTIALS_ID = credentials('gittoken')  // Jenkins ID for GitHub credentials, 这个其实拿到了
-        GIT_TOKEN = credentials('gittoken')
+        REGISTRY_CREDENTIALS = 'dockerAuthInfo'
     }
 
     parameters {
@@ -77,6 +77,21 @@ pipeline {
                     sh 'echo "当前目录是: " `pwd`'  // /home/jenkins/agent/workspace/mvn-scm-demo
                     sh 'echo 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}'
                     sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
+                }
+            }
+        }
+
+        stage('Docker Image Push ') {
+            steps {
+                container('docker') {
+                    withCredentials([usernamePassword(credentialsId: '${REGISTRY_CREDENTIALS}', passwordVariable: '${DOCKER_PASSWORD}', usernameVariable: '${DOCKER_USERNAME}')]) {
+                        script {
+                            sh '''
+                            echo docker 用户名称为: $DOCKER_USERNAME
+                            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                            '''
+                        }
+                    }
                 }
             }
         }
