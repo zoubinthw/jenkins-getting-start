@@ -72,30 +72,30 @@ pipeline {
                 }
             }
         }
-//
-//         stage('Maven Build') {
-//             steps {
-//                 container('maven') {
-//                     // Clean and package the Maven project
-//                     sh 'echo "开始build"'
-//                     sh 'mvn clean install -Dmaven.test.skip=true'
-//                     sh 'mvn clean package'
-//                 }
-//             }
-//         }
-//
-//         stage('Docker image build') {
-//             steps {
-//                 container('docker') {
-//                     // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
-//                     sh 'echo "当前目录是: " `pwd`'  // /home/jenkins/agent/workspace/mvn-scm-demo
-//                     sh 'echo 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}'
-//                     sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
-//                 }
-//             }
-//         }
 
-        stage('Authenticate with AWS ECR') {
+        stage('Maven Build') {
+            steps {
+                container('maven') {
+                    // Clean and package the Maven project
+                    sh 'echo "开始build"'
+                    sh 'mvn clean install -Dmaven.test.skip=true'
+                    sh 'mvn clean package'
+                }
+            }
+        }
+
+        stage('Docker image build') {
+            steps {
+                container('docker') {
+                    // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
+                    sh 'echo "当前目录是: " `pwd`'  // /home/jenkins/agent/workspace/mvn-scm-demo
+                    sh 'echo 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}'
+                    sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
+                }
+            }
+        }
+
+        stage('获取AWS ECR认证信息') {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
@@ -103,17 +103,6 @@ pipeline {
                 ]]) {
                     container('aws-cli') {
                         script {
-//                             sh '''
-//                             # Get ECR login command and authenticate Docker with AWS
-//                             # $(aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com)
-//                             # Example: Fetch an ECR login URL
-//                             # def ecrLoginUrl = sh(script: 'aws ecr get-login-password --region ${AWS_REGION}', returnStdout: true).trim()
-//                             export PSS=$(aws ecr get-login-password --region ${AWS_REGION})
-//                             # Write environment variables to a file
-//                             writeFile file: '/tmp/env-vars/env-vars.properties', text: """
-//                             ECR_LOGIN_URL=${PSS}
-//                             """
-//                             '''
                             def ecrLoginUrl = sh(script: 'aws ecr get-login-password --region ${AWS_REGION}', returnStdout: true).trim()
                             writeFile file: 'env-vars.properties', text: "ECR_LOGIN_URL=${ecrLoginUrl}"
                         }
@@ -122,7 +111,7 @@ pipeline {
             }
         }
 
-        stage('docker镜像提交') {
+        stage('Docker 镜像提交') {
             steps {
                 container('docker') {
                     script {
@@ -130,7 +119,18 @@ pipeline {
                         def ecrLoginUrl = sh(script: 'grep "^ECR_LOGIN_URL=" env-vars.properties | cut -d "=" -f2', returnStdout: true).trim()
                         withEnv(["ECR_LOGIN_URL=${ecrLoginUrl}"]) {
                             sh 'echo "ECR Login URL: ${ECR_LOGIN_URL}"'
-                            // Use ${ECR_LOGIN_URL} in your Docker commands or other scripts
+                            sh '''
+                            echo ${ECR_LOGIN_URL} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                            # Tag the image
+                            docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
+
+                            # Push the image to ECR
+                            docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
+
+                            # Tag the image as 'latest'
+                            docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
+                            docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
+                            '''
                         }
                     }
                 }
