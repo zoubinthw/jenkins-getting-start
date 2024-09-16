@@ -46,6 +46,7 @@ pipeline {
         stage('拉取代码') {
             steps {
                 container('maven') {
+                    sh 'echo ${BRANCH}'
                     // Checkout the repository from GitHub
                     checkout([
                         $class: 'GitSCM',
