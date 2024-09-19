@@ -35,3 +35,39 @@ Repositories URL: https://github.com/zoubinthw/jenkins-getting-start.git 带.git
 Credentials: 留空 <br>
 其他的jenkins按文档走 <br>
 (10)Dashboard -> Manage Jenkins -> System -> GitHub 这里API URL配置: https://api.github.com, Credentials配置在github创建的access token
+
+7.mq相关
+9月17安装docker 5.3.0
+docker pull apache/rocketmq:latest
+docker network create rocketmq
+# 启动 NameServer
+docker run -d --name rmqnamesrv -p 9876:9876 --network rocketmq apache/rocketmq:latest sh mqnamesrv
+
+# 验证 NameServer 是否启动成功
+docker logs -f rmqnamesrv
+
+# 配置 Broker 的IP地址
+echo "brokerIP1=127.0.0.1" > broker.conf
+
+# 启动 Broker 和 Proxy
+docker run -d \
+--name rmqbroker \
+--network rocketmq \
+-p 10911:10911 -p 10909:10909 -p 10912:10912 \
+-e "NAMESRV_ADDR=rmqnamesrv:9876" \
+-v /home/zoubin/rocket/volumn/mq_v5_3_0_vol/broker.conf:/home/rocketmq/rocketmq-5.3.0/conf/broker.conf \
+apache/rocketmq:latest sh mqbroker --enable-proxy \
+-c /home/rocketmq/rocketmq-5.3.0/conf/broker.conf
+# 切记配置一下broker的配置文件:
+# ip既可以配置broker的ip地址, 也可以配置它在docker中的name, 但是如果要让java程序能够访问到, 还是配置成ip, 或者配置一下dns
+brokerIP1=rmqbroker
+brokerClusterName=DefaultCluster
+brokerName=broker-a
+
+# 验证 Broker 是否启动成功
+docker exec -it rmqbroker bash -c "tail -n 10 /home/rocketmq/logs/rocketmqlogs/proxy.log"
+
+# 安装dashboard
+docker run -d --name rmqdashboard --network rocketmq -p 8090:8080 \
+-e "JAVA_OPTS=-Drocketmq.namesrv.addr=rmqnamesrv:9876 -Drocketmq.proxy.addr=rmqbroker:10909" \
+apacherocketmq/rocketmq-dashboard:latest
