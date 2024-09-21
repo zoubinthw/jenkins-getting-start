@@ -6,15 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CountController {
 
-//    @Autowired
-//    private StringRedisTemplate redisTemplate;
-//
-//    @GetMapping("/hello")
-//    public String count() {
-//        Long cntPeople = redisTemplate.opsForValue().increment("count-people");
-//        return "有 [" + cntPeople + "] 人访问了这个页面";
-//    }
-
     @GetMapping("/world")
     public String world() {
         return "舒服了";

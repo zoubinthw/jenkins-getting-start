@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: websocket
+server:
+  port: 8098
+
+rocketmq:
+  name-server: 127.0.0.1:9876  # Replace with your nameserver IP and port
+  producer:
+    group: demo_producer
+    topic: TestTopic
+  consumer:
+    group: demo_consumer
+    topic: TestTopic  # Replace with your actual topic name
