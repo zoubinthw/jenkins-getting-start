@@ -1,0 +1,66 @@
+---
+# nameserver
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rocketmq-nameserver-config
+data:
+  nameserver.conf: |
+    # Add any nameserver-specific configuration here
+---
+# master1
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rocketmq-master1-config
+data:
+  broker.conf: |
+    brokerClusterName=rocketmq-cluster
+    brokerName=broker-a
+    brokerId=0
+    namesrvAddr=rocketmq-nameserver:9876
+    autoCreateTopicEnable=true
+    # Add additional master broker-specific settings
+---
+# master2
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rocketmq-master2-config
+data:
+  broker.conf: |
+    brokerClusterName=rocketmq-cluster
+    brokerName=broker-b
+    brokerId=0
+    namesrvAddr=rocketmq-nameserver:9876
+    autoCreateTopicEnable=true
+    # Add additional master broker-specific settings
+---
+# slave1
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rocketmq-slave1-config
+data:
+  broker.conf: |
+    brokerClusterName=rocketmq-cluster
+    brokerName=broker-a
+    brokerId=1
+    namesrvAddr=rocketmq-nameserver:9876
+    autoCreateTopicEnable=false
+    masterAddress=rocketmq-master1:10911
+
+---
+# slave2
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rocketmq-slave2-config
+data:
+  broker.conf: |
+    brokerClusterName=rocketmq-cluster
+    brokerName=broker-b
+    brokerId=1
+    namesrvAddr=rocketmq-nameserver:9876
+    autoCreateTopicEnable=false
+    masterAddress=rocketmq-master2:10911
