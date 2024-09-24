@@ -4,6 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rocketmq-nameserver
+  namespace: rocket-mq
   labels:
     app: rocketmq-nameserver
 spec:
@@ -35,6 +36,9 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: rocketmq-master1
+  namespace: rocket-mq
+  labels:
+    app: rocketmq-master1
 spec:
   serviceName: rocketmq-master1
   replicas: 1
@@ -79,6 +83,9 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: rocketmq-master2
+  namespace: rocket-mq
+  labels:
+    app: rocketmq-master2
 spec:
   serviceName: rocketmq-master2
   replicas: 1
@@ -122,6 +129,9 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: rocketmq-slave1
+  namespace: rocket-mq
+  labels:
+    app: rocketmq-slave1
 spec:
   serviceName: rocketmq-slave1
   replicas: 1
@@ -165,6 +175,9 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: rocketmq-slave2
+  namespace: rocket-mq
+  labels:
+    app: rocketmq-slave2
 spec:
   serviceName: rocketmq-slave2
   replicas: 1
@@ -208,6 +221,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rocketmq-dashboard
+  namespace: rocket-mq
   labels:
     app: rocketmq-dashboard
 spec:
