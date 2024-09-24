@@ -99,7 +99,7 @@ pipeline {
 
         stage('Install Docker CLI in awscli container') {
             steps {
-                container('awscli') {
+                container('aws-cli') {
                     script {
                         sh '''
                             apt-get update && apt-get install -y docker.io
