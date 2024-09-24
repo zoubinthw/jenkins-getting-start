@@ -66,7 +66,7 @@ pipeline {
         stage('拉取代码') {
             steps {
                 container('maven') {
-                    sh 'echo 拉取分支: ${params.BRANCH}'
+                    echo "拉取分支: ${params.BRANCH}"
                     // Checkout the repository from GitHub
                     checkout([
                         $class: 'GitSCM',
