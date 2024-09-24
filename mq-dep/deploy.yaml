@@ -19,8 +19,8 @@ spec:
     spec:
       containers:
         - name: nameserver
-          image: apache/rocketmq:latest
-          command: ["sh", "-c", "mqnamesrv"]
+          image: apache/rocketmq:5.3.0
+          command: ["sh", "mqnamesrv"]
           ports:
             - containerPort: 9876
           resources:
@@ -152,10 +152,10 @@ spec:
             - containerPort: 10909
           resources:
             requests:
-              memory: "1Gi"         # Guaranteed memory
+              memory: "2Gi"         # Guaranteed memory
               cpu: "300m"           # Guaranteed CPU
             limits:
-              memory: "2Gi"         # Maximum memory
+              memory: "4Gi"         # Maximum memory
               cpu: "500m"           # Maximum CPU
           volumeMounts:
             - name: config-volume
@@ -198,10 +198,10 @@ spec:
             - containerPort: 10909
           resources:
             requests:
-              memory: "1Gi"         # Guaranteed memory
+              memory: "2Gi"         # Guaranteed memory
               cpu: "300m"           # Guaranteed CPU
             limits:
-              memory: "2Gi"         # Maximum memory
+              memory: "4Gi"         # Maximum memory
               cpu: "500m"           # Maximum CPU
           volumeMounts:
             - name: config-volume
@@ -236,7 +236,7 @@ spec:
     spec:
       containers:
         - name: dashboard
-          image: apache/rocketmq-dashboard:latest
+          image: apacherocketmq/rocketmq-dashboard:latest
           ports:
             - containerPort: 8080
           resources:
