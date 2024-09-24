@@ -109,9 +109,6 @@ pipeline {
                     container('aws-cli') {
                         script {
                             def ecrLoginUrl = sh(script: 'aws ecr get-login-password --region ${AWS_REGION}', returnStdout: true).trim()
-                            echo "test bbbbbbbbbbbbbb"
-                            echo ecrLoginUrl
-                            echo "test bbbbbbbbbbbbbb"
                             writeFile file: 'env-vars.properties', text: "ECR_LOGIN_URL=${ecrLoginUrl}"
                         }
                     }
@@ -127,6 +124,9 @@ pipeline {
                         def ecrLoginUrl = sh(script: 'grep "^ECR_LOGIN_URL=" env-vars.properties | cut -d "=" -f2', returnStdout: true).trim()
                         withEnv(["ECR_LOGIN_URL=${ecrLoginUrl}"]) {
                             sh '''
+                            echo ++++++++++++++++
+                            echo ${ECR_LOGIN_URL}
+                            echo ++++++++++++++++
                             echo 登录并推送镜像到ECR [${BUILD_NUMBER} , latest]
                             grep "^ECR_LOGIN_URL=" env-vars.properties | cut -d "=" -f2 | docker login --username AWS --password-stdin  ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
