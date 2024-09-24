@@ -102,7 +102,8 @@ pipeline {
                 container('aws-cli') {
                     script {
                         sh '''
-                            apt-get update && apt-get install -y docker.io
+                            yum update -y
+                            yum install -y docker
                         '''
                     }
                 }
