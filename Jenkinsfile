@@ -109,6 +109,9 @@ pipeline {
                     container('aws-cli') {
                         script {
                             def ecrLoginUrl = sh(script: 'aws ecr get-login-password --region ${AWS_REGION}', returnStdout: true).trim()
+                            echo "test bbbbbbbbbbbbbb"
+                            echo ecrLoginUrl
+                            echo "test bbbbbbbbbbbbbb"
                             writeFile file: 'env-vars.properties', text: "ECR_LOGIN_URL=${ecrLoginUrl}"
                         }
                     }
