@@ -20,6 +20,8 @@ metadata:
 spec:
   ports:
     - port: 10911
+      targetPort: 10911    # The default broker port inside the container
+      protocol: TCP        # RocketMQ uses TCP
   selector:
     app: rocketmq-master1
 
@@ -32,6 +34,8 @@ metadata:
 spec:
   ports:
     - port: 10911
+      targetPort: 10911    # The default broker port inside the container
+      protocol: TCP        # RocketMQ uses TCP
   selector:
     app: rocketmq-master2
 
