@@ -1,0 +1,237 @@
+---
+# nameserver
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rocketmq-nameserver
+  labels:
+    app: rocketmq-nameserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rocketmq-nameserver
+  template:
+    metadata:
+      labels:
+        app: rocketmq-nameserver
+    spec:
+      containers:
+        - name: nameserver
+          image: apache/rocketmq:latest
+          args: ["mqnamesrv"]  # Start the container in nameserver mode
+          ports:
+            - containerPort: 9876
+          resources:
+            requests:
+              memory: "512Mi"        # Guaranteed minimum memory
+              cpu: "200m"            # Guaranteed minimum CPU
+            limits:
+              memory: "1Gi"          # Maximum memory usage
+              cpu: "500m"            # Maximum CPU usage
+---
+# master1
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rocketmq-master1
+spec:
+  serviceName: rocketmq-master1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rocketmq-master1
+  template:
+    metadata:
+      labels:
+        app: rocketmq-master1
+    spec:
+      containers:
+        - name: broker-master
+          image: apache/rocketmq:5.0.0
+          args: ["mqbroker", "-c", "/etc/rocketmq/broker.conf"]
+          ports:
+            - containerPort: 10911
+            - containerPort: 10909
+          resources:
+            requests:
+              memory: "2Gi"         # Guaranteed memory
+              cpu: "500m"           # Guaranteed CPU
+            limits:
+              memory: "4Gi"         # Maximum memory
+              cpu: "1000m"          # Maximum CPU
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/rocketmq
+            - name: storage
+              mountPath: /home/rocketmq/store
+      volumes:
+        - name: config-volume
+          configMap:
+            name: rocketmq-master1-config
+        - name: storage
+          persistentVolumeClaim:
+            claimName: rocketmq-master1-pvc
+
+---
+# master2
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rocketmq-master2
+spec:
+  serviceName: rocketmq-master2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rocketmq-master2
+  template:
+    metadata:
+      labels:
+        app: rocketmq-master2
+    spec:
+      containers:
+        - name: broker-master
+          image: apache/rocketmq:5.0.0
+          args: ["mqbroker", "-c", "/etc/rocketmq/broker.conf"]
+          ports:
+            - containerPort: 10911
+            - containerPort: 10909
+          resources:
+            requests:
+              memory: "2Gi"         # Guaranteed memory
+              cpu: "500m"           # Guaranteed CPU
+            limits:
+              memory: "4Gi"         # Maximum memory
+              cpu: "1000m"          # Maximum CPU
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/rocketmq
+            - name: storage
+              mountPath: /home/rocketmq/store
+      volumes:
+        - name: config-volume
+          configMap:
+            name: rocketmq-master2-config
+        - name: storage
+          persistentVolumeClaim:
+            claimName: rocketmq-master2-pvc
+---
+# slave1
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rocketmq-slave1
+spec:
+  serviceName: rocketmq-slave1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rocketmq-slave1
+  template:
+    metadata:
+      labels:
+        app: rocketmq-slave1
+    spec:
+      containers:
+        - name: broker-slave
+          image: apache/rocketmq:5.0.0
+          args: ["mqbroker", "-c", "/etc/rocketmq/broker.conf"]
+          ports:
+            - containerPort: 10911
+            - containerPort: 10909
+          resources:
+            requests:
+              memory: "1Gi"         # Guaranteed memory
+              cpu: "300m"           # Guaranteed CPU
+            limits:
+              memory: "2Gi"         # Maximum memory
+              cpu: "500m"           # Maximum CPU
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/rocketmq
+            - name: storage
+              mountPath: /home/rocketmq/store
+      volumes:
+        - name: config-volume
+          configMap:
+            name: rocketmq-slave1-config
+        - name: storage
+          persistentVolumeClaim:
+            claimName: rocketmq-slave1-pvc
+---
+# slave2
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rocketmq-slave2
+spec:
+  serviceName: rocketmq-slave2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rocketmq-slave2
+  template:
+    metadata:
+      labels:
+        app: rocketmq-slave2
+    spec:
+      containers:
+        - name: broker-slave
+          image: apache/rocketmq:5.0.0
+          args: ["mqbroker", "-c", "/etc/rocketmq/broker.conf"]
+          ports:
+            - containerPort: 10911
+            - containerPort: 10909
+          resources:
+            requests:
+              memory: "1Gi"         # Guaranteed memory
+              cpu: "300m"           # Guaranteed CPU
+            limits:
+              memory: "2Gi"         # Maximum memory
+              cpu: "500m"           # Maximum CPU
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/rocketmq
+            - name: storage
+              mountPath: /home/rocketmq/store
+      volumes:
+        - name: config-volume
+          configMap:
+            name: rocketmq-slave2-config
+        - name: storage
+          persistentVolumeClaim:
+            claimName: rocketmq-slave2-pvc
+---
+# dashboard
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rocketmq-dashboard
+  labels:
+    app: rocketmq-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rocketmq-dashboard
+  template:
+    metadata:
+      labels:
+        app: rocketmq-dashboard
+    spec:
+      containers:
+        - name: dashboard
+          image: apache/rocketmq-dashboard:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "256Mi"        # Guaranteed minimum memory
+              cpu: "100m"            # Guaranteed minimum CPU
+            limits:
+              memory: "512Mi"        # Maximum memory usage
+              cpu: "300m"            # Maximum CPU usage
+          env:
+            - name: JAVA_OPTS
+              value: "-Drocketmq.namesrv.addr=rocketmq-nameserver:9876"

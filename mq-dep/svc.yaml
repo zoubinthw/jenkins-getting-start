@@ -1,0 +1,55 @@
+---
+# nameserve
+apiVersion: v1
+kind: Service
+metadata:
+  name: rocketmq-nameserver
+spec:
+  ports:
+    - port: 9876
+      targetPort: 9876
+  selector:
+    app: rocketmq-nameserver
+
+---
+# master1
+apiVersion: v1
+kind: Service
+metadata:
+  name: rocketmq-master1
+spec:
+  ports:
+    - port: 10911
+      targetPort: 10911    # The default broker port inside the container
+      protocol: TCP        # RocketMQ uses TCP
+  selector:
+    app: rocketmq-master1
+
+---
+# master2
+apiVersion: v1
+kind: Service
+metadata:
+  name: rocketmq-master2
+spec:
+  ports:
+    - port: 10911
+      targetPort: 10911    # The default broker port inside the container
+      protocol: TCP        # RocketMQ uses TCP
+  selector:
+    app: rocketmq-master2
+
+---
+# dashboard
+apiVersion: v1
+kind: Service
+metadata:
+  name: rocketmq-dashboard
+spec:
+  type: NodePort  # Specifies the service type as NodePort
+  ports:
+    - port: 8080              # Internal port of the service
+      targetPort: 8080         # Container port
+      nodePort: 32080          # The external port on the node (must be in the range 30000-32767)
+  selector:
+    app: rocketmq-dashboard
