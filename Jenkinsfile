@@ -15,14 +15,6 @@ pipeline {
                 command:
                 - cat
                 tty: true
-              - name: docker
-                image: docker:20.10.8
-                command:
-                - cat
-                tty: true
-                volumeMounts:
-                - name: docker-sock
-                  mountPath: /var/run/docker.sock
               - name: kubectl
                 image: bitnami/kubectl:latest
                 command:
@@ -35,10 +27,25 @@ pipeline {
                 command:
                 - cat
                 tty: true
+                volumeMounts:
+                - name: docker-socket
+                  mountPath: /var/run/docker.sock
+              - name: dind
+                  image: docker:19.03.12-dind
+                  securityContext:
+                    privileged: true
+                  env:
+                  - name: DOCKER_TLS_CERTDIR
+                    value: ""
+                  volumeMounts:
+                  - name: docker-graph-storage
+                    mountPath: /var/lib/docker
               volumes:
-              - name: docker-sock
+              - name: docker-socket
                 hostPath:
                   path: /var/run/docker.sock
+              - name: docker-graph-storage
+                emptyDir: {}
             '''
         }
     }
@@ -92,7 +99,7 @@ pipeline {
 
         stage('Docker image build') {
             steps {
-                container('docker') {
+                container('aws-cli') {
                     // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
                     sh 'echo 开始制作镜像, 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}'
                     sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
@@ -108,8 +115,9 @@ pipeline {
                 ]]) {
                     container('aws-cli') {
                         script {
-                            def ecrLoginUrl = sh(script: 'aws ecr get-login-password --region ${AWS_REGION}', returnStdout: true).trim()
-                            writeFile file: 'env-vars.properties', text: "ECR_LOGIN_URL=${ecrLoginUrl}"
+                            sh '''
+                            aws ecr get-login-password --region ap-east-1 | docker login --username AWS --password-stdin 471112990918.dkr.ecr.ap-east-1.amazonaws.com
+                            '''
                         }
                     }
                 }
@@ -118,25 +126,19 @@ pipeline {
 
         stage('推送Docker镜像') {
             steps {
-                container('docker') {
+                container('aws-cli') {
                     script {
-                        // Read the properties file using shell commands
-                        def ecrLoginUrl = sh(script: 'grep "^ECR_LOGIN_URL=" env-vars.properties | cut -d "=" -f2', returnStdout: true).trim()
-                        withEnv(["ECR_LOGIN_URL=${ecrLoginUrl}"]) {
-                            sh '''
-                            echo 登录并推送镜像到ECR [${BUILD_NUMBER} , latest]
-                            docker login --username AWS -p ${ECR_LOGIN_URL}  ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                        sh '''
+                        echo 推送镜像到ECR [${BUILD_NUMBER} , latest]
+                        # Tag the image
+                        docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
+                        # Push the image to ECR
+                        docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
 
-                            # Tag the image
-                            docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
-                            # Push the image to ECR
-                            docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
-
-                            # Tag the image as 'latest'
-                            docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
-                            docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
-                            '''
-                        }
+                        # Tag the image as 'latest'
+                        docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
+                        docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
+                        '''
                     }
                 }
             }
