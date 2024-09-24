@@ -20,7 +20,7 @@ spec:
       containers:
         - name: nameserver
           image: apache/rocketmq:latest
-          args: ["mqnamesrv"]  # Start the container in nameserver mode
+          command: ["sh", "-c", "mqnamesrv"]
           ports:
             - containerPort: 9876
           resources:
@@ -53,7 +53,7 @@ spec:
       containers:
         - name: broker-master
           image: apache/rocketmq:5.0.0
-          args: ["mqbroker", "-c", "/etc/rocketmq/broker.conf"]
+          args: ["sh", "mqbroker", "-c", "/etc/rocketmq/broker.conf"]
           ports:
             - containerPort: 10911
             - containerPort: 10909
@@ -100,7 +100,7 @@ spec:
       containers:
         - name: broker-master
           image: apache/rocketmq:5.0.0
-          args: ["mqbroker", "-c", "/etc/rocketmq/broker.conf"]
+          args: ["sh", "mqbroker", "-c", "/etc/rocketmq/broker.conf"]
           ports:
             - containerPort: 10911
             - containerPort: 10909
@@ -146,7 +146,7 @@ spec:
       containers:
         - name: broker-slave
           image: apache/rocketmq:5.0.0
-          args: ["mqbroker", "-c", "/etc/rocketmq/broker.conf"]
+          args: ["sh", "mqbroker", "-c", "/etc/rocketmq/broker.conf"]
           ports:
             - containerPort: 10911
             - containerPort: 10909
@@ -192,7 +192,7 @@ spec:
       containers:
         - name: broker-slave
           image: apache/rocketmq:5.0.0
-          args: ["mqbroker", "-c", "/etc/rocketmq/broker.conf"]
+          args: ["sh", "mqbroker", "-c", "/etc/rocketmq/broker.conf"]
           ports:
             - containerPort: 10911
             - containerPort: 10909
