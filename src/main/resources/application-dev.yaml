@@ -5,7 +5,7 @@ server:
   port: 8098
 
 rocketmq:
-  name-server: 127.0.0.1:9876  # Replace with your nameserver IP and port
+  name-server: rocketmq-nameserver.rocket-mq.svc.cluster.local:9876  # Replace with your nameserver IP and port
   producer:
     group: demo_producer
     topic: TestTopic

@@ -56,19 +56,21 @@ pipeline {
     }
 
     parameters {
-        string(name: 'PROJECT_VERSION', defaultValue: '1.0', description: '')
-        string(name: 'PROJECT_NAME', defaultValue: 'demo', description: '')
-        string(name: 'BRANCH', defaultValue: 'main', description: '')
+        string(name: 'PROJECT_VERSION', defaultValue: '1.0', description: '项目版本')
+        string(name: 'PROJECT_NAME', defaultValue: 'demo', description: '项目名称')
+        choice(name: 'BRANCH', choices: ['main', 'dev'], description: '部署的分支')
+        choice(name: 'PROFILE', choices: ['dev', 'local'], description: '使用的配置文件')
     }
 
     stages {
         stage('拉取代码') {
             steps {
                 container('maven') {
+                    sh 'echo 拉取分支: ${params.BRANCH}'
                     // Checkout the repository from GitHub
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: "*/${BRANCH}"]],
+                        branches: [[name: "*/${params.BRANCH}"]],
                         userRemoteConfigs: [[
                             url: "${GIT_REPO}",
                             credentialsId: "${GIT_CREDENTIALS_ID}"
@@ -82,10 +84,8 @@ pipeline {
             steps {
                 container('maven') {
                     // Clean and package the Maven project
-                    sh 'echo 开始maven build'
-                    sh 'mvn clean install -Dmaven.test.skip=true'
-                    sh 'mvn clean package'
-                }
+                    sh 'echo 开始maven build, 使用的配置为: ${params.PROFILE}'
+                    sh 'mvn clean package -P ${params.PROFILE}'                }
             }
         }
 
@@ -93,8 +93,7 @@ pipeline {
             steps {
                 container('docker') {
                     // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
-                    sh 'echo 开始制作镜像'
-                    sh 'echo 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}'
+                    sh 'echo 开始制作镜像, 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}'
                     sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
                 }
             }
