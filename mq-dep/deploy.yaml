@@ -4,6 +4,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rocketmq-nameserver
+  labels:
+    app: rocketmq-nameserver
 spec:
   replicas: 1
   selector:
@@ -16,21 +18,10 @@ spec:
     spec:
       containers:
         - name: nameserver
-          image: apache/rocketmq:5.0.0
-          args: ["mqnamesrv"]
-          volumeMounts:
-            - name: config-volume
-              mountPath: /etc/rocketmq
-            - name: storage
-              mountPath: /home/rocketmq/store
-      volumes:
-        - name: config-volume
-          configMap:
-            name: rocketmq-nameserver-config
-        - name: storage
-          persistentVolumeClaim:
-            claimName: rocketmq-nameserver-pvc
-
+          image: apache/rocketmq:latest
+          args: ["mqnamesrv"]  # Start the container in nameserver mode
+          ports:
+            - containerPort: 9876
 ---
 # master1
 apiVersion: apps/v1
@@ -170,6 +161,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rocketmq-dashboard
+  labels:
+    app: rocketmq-dashboard
 spec:
   replicas: 1
   selector:
@@ -185,10 +178,6 @@ spec:
           image: apache/rocketmq-dashboard:latest
           ports:
             - containerPort: 8080
-          volumeMounts:
-            - name: storage
-              mountPath: /mnt/rocketmq/dashboard
-      volumes:
-        - name: storage
-          persistentVolumeClaim:
-            claimName: rocketmq-dashboard-pvc
+          env:
+            - name: JAVA_OPTS
+              value: "-Drocketmq.namesrv.addr=rocketmq-nameserver:9876"

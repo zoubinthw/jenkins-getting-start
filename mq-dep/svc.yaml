@@ -42,9 +42,10 @@ kind: Service
 metadata:
   name: rocketmq-dashboard
 spec:
-  type: LoadBalancer
+  type: NodePort  # Specifies the service type as NodePort
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 8080              # Internal port of the service
+      targetPort: 8080         # Container port
+      nodePort: 32080          # The external port on the node (must be in the range 30000-32767)
   selector:
     app: rocketmq-dashboard

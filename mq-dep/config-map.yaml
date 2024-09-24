@@ -1,13 +1,4 @@
 ---
-# nameserver
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: rocketmq-nameserver-config
-data:
-  nameserver.conf: |
-    # Add any nameserver-specific configuration here
----
 # master1
 apiVersion: v1
 kind: ConfigMap
