@@ -22,6 +22,13 @@ spec:
           args: ["mqnamesrv"]  # Start the container in nameserver mode
           ports:
             - containerPort: 9876
+          resources:
+            requests:
+              memory: "512Mi"        # Guaranteed minimum memory
+              cpu: "200m"            # Guaranteed minimum CPU
+            limits:
+              memory: "1Gi"          # Maximum memory usage
+              cpu: "500m"            # Maximum CPU usage
 ---
 # master1
 apiVersion: apps/v1
@@ -43,6 +50,16 @@ spec:
         - name: broker-master
           image: apache/rocketmq:5.0.0
           args: ["mqbroker", "-c", "/etc/rocketmq/broker.conf"]
+          ports:
+            - containerPort: 10911
+            - containerPort: 10909
+          resources:
+            requests:
+              memory: "2Gi"         # Guaranteed memory
+              cpu: "500m"           # Guaranteed CPU
+            limits:
+              memory: "4Gi"         # Maximum memory
+              cpu: "1000m"          # Maximum CPU
           volumeMounts:
             - name: config-volume
               mountPath: /etc/rocketmq
@@ -77,6 +94,16 @@ spec:
         - name: broker-master
           image: apache/rocketmq:5.0.0
           args: ["mqbroker", "-c", "/etc/rocketmq/broker.conf"]
+          ports:
+            - containerPort: 10911
+            - containerPort: 10909
+          resources:
+            requests:
+              memory: "2Gi"         # Guaranteed memory
+              cpu: "500m"           # Guaranteed CPU
+            limits:
+              memory: "4Gi"         # Maximum memory
+              cpu: "1000m"          # Maximum CPU
           volumeMounts:
             - name: config-volume
               mountPath: /etc/rocketmq
@@ -110,6 +137,16 @@ spec:
         - name: broker-slave
           image: apache/rocketmq:5.0.0
           args: ["mqbroker", "-c", "/etc/rocketmq/broker.conf"]
+          ports:
+            - containerPort: 10911
+            - containerPort: 10909
+          resources:
+            requests:
+              memory: "1Gi"         # Guaranteed memory
+              cpu: "300m"           # Guaranteed CPU
+            limits:
+              memory: "2Gi"         # Maximum memory
+              cpu: "500m"           # Maximum CPU
           volumeMounts:
             - name: config-volume
               mountPath: /etc/rocketmq
@@ -143,6 +180,16 @@ spec:
         - name: broker-slave
           image: apache/rocketmq:5.0.0
           args: ["mqbroker", "-c", "/etc/rocketmq/broker.conf"]
+          ports:
+            - containerPort: 10911
+            - containerPort: 10909
+          resources:
+            requests:
+              memory: "1Gi"         # Guaranteed memory
+              cpu: "300m"           # Guaranteed CPU
+            limits:
+              memory: "2Gi"         # Maximum memory
+              cpu: "500m"           # Maximum CPU
           volumeMounts:
             - name: config-volume
               mountPath: /etc/rocketmq
@@ -178,6 +225,13 @@ spec:
           image: apache/rocketmq-dashboard:latest
           ports:
             - containerPort: 8080
+          resources:
+            requests:
+              memory: "256Mi"        # Guaranteed minimum memory
+              cpu: "100m"            # Guaranteed minimum CPU
+            limits:
+              memory: "512Mi"        # Maximum memory usage
+              cpu: "300m"            # Maximum CPU usage
           env:
             - name: JAVA_OPTS
               value: "-Drocketmq.namesrv.addr=rocketmq-nameserver:9876"
