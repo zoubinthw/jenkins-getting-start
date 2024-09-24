@@ -31,15 +31,15 @@ pipeline {
                 - name: docker-socket
                   mountPath: /var/run/docker.sock
               - name: dind
-                  image: docker:19.03.12-dind
-                  securityContext:
-                    privileged: true
-                  env:
-                  - name: DOCKER_TLS_CERTDIR
-                    value: ""
-                  volumeMounts:
-                  - name: docker-graph-storage
-                    mountPath: /var/lib/docker
+                image: docker:19.03.12-dind
+                securityContext:
+                  privileged: true
+                env:
+                - name: DOCKER_TLS_CERTDIR
+                  value: ""
+                volumeMounts:
+                - name: docker-graph-storage
+                  mountPath: /var/lib/docker
               volumes:
               - name: docker-socket
                 hostPath:
