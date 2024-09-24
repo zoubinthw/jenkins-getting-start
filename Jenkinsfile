@@ -97,6 +97,18 @@ pipeline {
             }
         }
 
+        stage('Install Docker CLI in awscli container') {
+            steps {
+                container('awscli') {
+                    script {
+                        sh '''
+                            apt-get update && apt-get install -y docker.io
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('Docker image build') {
             steps {
                 container('aws-cli') {
