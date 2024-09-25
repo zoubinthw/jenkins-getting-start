@@ -28,23 +28,23 @@ pipeline {
                 - cat
                 tty: true
                 volumeMounts:
+                - name: shared-workspace
+                  mountPath: /workspace
+              - name: docker
+                image: docker:20.10.8
+                command:
+                - cat
+                tty: true
+                volumeMounts:
                 - name: docker-socket
                   mountPath: /var/run/docker.sock
-              - name: dind
-                image: docker:19.03.12-dind
-                securityContext:
-                  privileged: true
-                env:
-                - name: DOCKER_TLS_CERTDIR
-                  value: ""
-                volumeMounts:
-                - name: docker-graph-storage
-                  mountPath: /var/lib/docker
+                - name: shared-workspace
+                  mountPath: /workspace
               volumes:
               - name: docker-socket
                 hostPath:
                   path: /var/run/docker.sock
-              - name: docker-graph-storage
+              - name: shared-workspace
                 emptyDir: {}
             '''
         }
@@ -129,7 +129,7 @@ pipeline {
                     container('aws-cli') {
                         script {
                             sh '''
-                            aws ecr get-login-password --region ap-east-1 | docker login --username AWS --password-stdin 471112990918.dkr.ecr.ap-east-1.amazonaws.com
+                            aws ecr get-login-password --region ${AWS_REGION} > /workspace/docker_password.txt
                             '''
                         }
                     }
@@ -143,6 +143,7 @@ pipeline {
                     script {
                         sh '''
                         echo 推送镜像到ECR [${BUILD_NUMBER} , latest]
+                        docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com < /workspace/docker_password.txt
                         # Tag the image
                         docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}
                         # Push the image to ECR
