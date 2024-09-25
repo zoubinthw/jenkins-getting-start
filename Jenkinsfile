@@ -97,22 +97,9 @@ pipeline {
             }
         }
 
-        stage('Install Docker CLI in awscli container') {
-            steps {
-                container('aws-cli') {
-                    script {
-                        sh '''
-                            yum update -y
-                            yum install -y docker
-                        '''
-                    }
-                }
-            }
-        }
-
         stage('Docker image build') {
             steps {
-                container('aws-cli') {
+                container('docker') {
                     // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
                     sh 'echo 开始制作镜像, 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}'
                     sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
@@ -139,7 +126,7 @@ pipeline {
 
         stage('推送Docker镜像') {
             steps {
-                container('aws-cli') {
+                container('docker') {
                     script {
                         sh '''
                         echo 推送镜像到ECR [${BUILD_NUMBER} , latest]
