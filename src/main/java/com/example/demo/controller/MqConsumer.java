@@ -22,11 +22,11 @@ public class MqConsumer {
     @GetMapping("/get_msg")
     public String mqProcessTest() throws MQClientException {
         // Instantiate a consumer group
-        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(mqConfig.getConsumer().getGroup());
+        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("demo_consumer");
         // Specify name server addresses
-        consumer.setNamesrvAddr(mqConfig.getNameServer());
+        consumer.setNamesrvAddr("rocketmq-nameserver.rocket-mq.svc.cluster.local:9876");
         // Subscribe to a topic
-        consumer.subscribe(mqConfig.getConsumer().getTopic(), "*");
+        consumer.subscribe("TestTopic", "*");
 
         // Register a callback to process messages
         consumer.registerMessageListener((MessageListenerConcurrently) (msgs, context) -> {

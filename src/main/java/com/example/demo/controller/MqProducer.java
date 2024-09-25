@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collections;
 
 @RestController
-public class MqProducter {
-    private static final Logger logger = LoggerFactory.getLogger(MqProducter.class);
+public class MqProducer {
+    private static final Logger logger = LoggerFactory.getLogger(MqProducer.class);
 
     @Autowired
     private RocketMQConfig mqConfig;
@@ -28,10 +28,10 @@ public class MqProducter {
         // Instantiate a producer group
         logger.info("mqSendTest");
         logger.info(mqConfig.toString());
-        DefaultMQProducer producer = new DefaultMQProducer(mqConfig.getProducer().getGroup());
+        DefaultMQProducer producer = new DefaultMQProducer("demo_producer");
         // Specify name server addresses
-        producer.setNamesrvAddr(mqConfig.getNameServer());
-        producer.setTopics(Collections.singletonList(mqConfig.getProducer().getTopic()));
+        producer.setNamesrvAddr("rocketmq-nameserver.rocket-mq.svc.cluster.local:9876");
+        producer.setTopics(Collections.singletonList("TestTopic"));
 //        producer.setSocksProxyConfig("localhost:10909");
         // Launch the instance
         producer.start();
