@@ -24,7 +24,7 @@ public class MqProducter {
 
 
     @GetMapping("/send_msg")
-    public void mqSendTest() throws MQClientException, MQBrokerException, RemotingException, InterruptedException {
+    public String mqSendTest() throws MQClientException, MQBrokerException, RemotingException, InterruptedException {
         // Instantiate a producer group
         DefaultMQProducer producer = new DefaultMQProducer(mqConfig.getProducer().getGroup());
         // Specify name server addresses
@@ -38,7 +38,8 @@ public class MqProducter {
         Message msg = new Message("TestTopic", "binzooo", "Hello RocketMQ".getBytes());
         // Send the message
         SendResult sendResult = producer.send(msg);
-        System.out.printf("%s%n", sendResult);
+        logger.info(sendResult.toString());
         producer.shutdown();
+        return sendResult.toString();
     }
 }

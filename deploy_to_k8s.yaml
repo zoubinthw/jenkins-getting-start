@@ -6,3 +6,4 @@ kubectl create secret docker-registry ecr-secret \
   --docker-email=any-email@example.com
 
 # 用于创建一个kubernetes可以用来从ecr拉取镜像的secret
+# 需要定期更新这个密钥, 否则拉去不到镜像

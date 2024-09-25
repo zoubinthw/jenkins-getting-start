@@ -20,7 +20,7 @@ public class MqConsumer {
     private RocketMQConfig mqConfig;
 
     @GetMapping("/get_msg")
-    public void mqProcessTest() throws MQClientException {
+    public String mqProcessTest() throws MQClientException {
         // Instantiate a consumer group
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(mqConfig.getConsumer().getGroup());
         // Specify name server addresses
@@ -39,5 +39,6 @@ public class MqConsumer {
         // Launch the instance
         consumer.start();
         logger.info("Consumer Started.\n");
+        return "Consumer Started";
     }
 }

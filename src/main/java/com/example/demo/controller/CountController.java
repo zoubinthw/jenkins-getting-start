@@ -8,6 +8,6 @@ public class CountController {
 
     @GetMapping("/world")
     public String world() {
-        return "舒服了";
+        return "更新了0925";
     }
 }
