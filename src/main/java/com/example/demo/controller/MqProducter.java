@@ -26,6 +26,8 @@ public class MqProducter {
     @GetMapping("/send_msg")
     public String mqSendTest() throws MQClientException, MQBrokerException, RemotingException, InterruptedException {
         // Instantiate a producer group
+        logger.info("mqSendTest");
+        logger.info(mqConfig.toString());
         DefaultMQProducer producer = new DefaultMQProducer(mqConfig.getProducer().getGroup());
         // Specify name server addresses
         producer.setNamesrvAddr(mqConfig.getNameServer());
