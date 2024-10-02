@@ -2,7 +2,7 @@ spring:
   application:
     name: websocket
 server:
-  port: 8098
+  port: 8080
 
 rocketmq:
   name-server: rocketmq-nameserver.rocket-mq.svc.cluster.local:9876  # Replace with your nameserver IP and port
