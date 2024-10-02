@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.config.RocketMQConfig;
+import com.example.demo.config.RocketmqConfig;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
@@ -17,16 +17,16 @@ public class MqConsumer {
     private static final Logger logger = LoggerFactory.getLogger(MqConsumer.class);
 
     @Autowired
-    private RocketMQConfig mqConfig;
+    private RocketmqConfig mqConfig;
 
     @GetMapping("/get_msg")
     public String mqProcessTest() throws MQClientException {
         // Instantiate a consumer group
-        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("demo_consumer");
+        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(mqConfig.getConsumer().getGroup());
         // Specify name server addresses
-        consumer.setNamesrvAddr("rocketmq-nameserver.rocket-mq.svc.cluster.local:9876");
+        consumer.setNamesrvAddr(mqConfig.getNameServer());
         // Subscribe to a topic
-        consumer.subscribe("TestTopic", "*");
+        consumer.subscribe(mqConfig.getConsumer().getTopic(), "*");
 
         // Register a callback to process messages
         consumer.registerMessageListener((MessageListenerConcurrently) (msgs, context) -> {

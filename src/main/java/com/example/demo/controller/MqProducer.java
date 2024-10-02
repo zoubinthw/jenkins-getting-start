@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.config.RocketMQConfig;
+import com.example.demo.config.RocketmqConfig;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
@@ -20,18 +20,18 @@ public class MqProducer {
     private static final Logger logger = LoggerFactory.getLogger(MqProducer.class);
 
     @Autowired
-    private RocketMQConfig mqConfig;
+    private RocketmqConfig mqConfig;
 
 
     @GetMapping("/send_msg")
     public String mqSendTest() throws MQClientException, MQBrokerException, RemotingException, InterruptedException {
         // Instantiate a producer group
         logger.info("mqSendTest");
-        logger.info(mqConfig.toString());
-        DefaultMQProducer producer = new DefaultMQProducer("demo_producer");
+        logger.info(mqConfig.getNameServer());
+        DefaultMQProducer producer = new DefaultMQProducer(mqConfig.getProducer().getGroup());
         // Specify name server addresses
-        producer.setNamesrvAddr("rocketmq-nameserver.rocket-mq.svc.cluster.local:9876");
-        producer.setTopics(Collections.singletonList("TestTopic"));
+        producer.setNamesrvAddr(mqConfig.getNameServer());
+        producer.setTopics(Collections.singletonList(mqConfig.getProducer().getTopic()));
 //        producer.setSocksProxyConfig("localhost:10909");
         // Launch the instance
         producer.start();

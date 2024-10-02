@@ -8,7 +8,7 @@ rocketmq:
   name-server: rocketmq-nameserver.rocket-mq.svc.cluster.local:9876  # Replace with your nameserver IP and port
   producer:
     group: demo_producer
-    topic: TestTopic
+    topic: TestTopic  # Replace with your actual topic name
   consumer:
     group: demo_consumer
     topic: TestTopic  # Replace with your actual topic name
