@@ -100,9 +100,14 @@ pipeline {
         stage('Docker image build') {
             steps {
                 container('docker') {
-                    // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
-                    sh 'echo 开始制作镜像, 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}, 激活的环境为: ${params.PROFILE}'
-                    sh "docker build --build-arg ACTIVE_PROFILE=${params.PROFILE} -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
+                    withEnv(["PROFILE=${params.PROFILE}"]) {
+                        // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
+                        // 因为纯sh不支持直接访问param里面的环境变量, 所以使用这种方式来写
+                        sh 'echo 开始制作镜像, 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}, 激活的环境为: ${PROFILE}'
+                        sh """#!/bin/bash -xe
+                            docker build --build-arg ACTIVE_PROFILE=${PROFILE} -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .
+                        """
+                    }
                 }
             }
         }
