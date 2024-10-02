@@ -4,6 +4,9 @@ FROM openjdk:17-jdk-slim
 # Set a build argument for the active Spring profile
 ARG ACTIVE_PROFILE=dev
 
+# Pass the build argument as an environment variable
+ENV ACTIVE_PROFILE=${ACTIVE_PROFILE}
+
 # Add a label to specify the active profile, 这个可加可不加, 用于说明镜像元数据信息的
 LABEL active-profile=${ACTIVE_PROFILE}
 
