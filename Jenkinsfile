@@ -102,7 +102,7 @@ pipeline {
                 container('docker') {
                     // jar包在: ./target/demo-0.0.1-SNAPSHOT.jar
                     sh 'echo 开始制作镜像, 镜像名称为: ${DOCKER_IMAGE}:${BUILD_NUMBER}, 激活的环境为: ${params.PROFILE}'
-                    sh 'docker build --build-arg ACTIVE_PROFILE=${params.PROFILE} -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
+                    sh "docker build --build-arg ACTIVE_PROFILE=${params.PROFILE} -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
                 }
             }
         }
