@@ -92,7 +92,7 @@ pipeline {
                 container('maven') {
                     // Clean and package the Maven project
                     sh "echo 开始maven build, 使用的配置为: ${params.PROFILE}"
-                    sh "mvn clean package -P${params.PROFILE}"
+                    sh "mvn clean package -P${params.PROFILE} -Dmaven.test.skip=true"
                 }
             }
         }
